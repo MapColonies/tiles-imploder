@@ -1,9 +1,9 @@
 import { promises as fsPromise } from 'fs';
 import { IConfig } from 'config';
 import { container, singleton } from 'tsyringe';
+import { Logger } from '@map-colonies/js-logger';
 import { Services } from './common/constants';
 import { Tile } from './tile';
-import { Logger } from '@map-colonies/js-logger';
 
 @singleton()
 export class TileGenerator {

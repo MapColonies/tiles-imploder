@@ -7,8 +7,8 @@ import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import * as ngeohash from 'ngeohash';
 import { Services } from '../common/constants';
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires
 /* TODO: add @types to this package */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires
 const shape2geohash = require('shape2geohash');
 
 @injectable()

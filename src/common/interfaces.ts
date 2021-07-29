@@ -13,13 +13,6 @@ export interface OpenApiConfig {
   uiPath: string;
 }
 
-export interface Tile {
-  x: number;
-  y: number;
-  z: number;
-  tileData?: Buffer;
-}
-
 export interface Coordinate {
   lon: number;
   lat: number;
@@ -29,4 +22,12 @@ export interface IInput {
   footprint: Polygon | MultiPolygon;
   bbox: BBox2d | true;
   zoomLevel: number;
+}
+
+export interface IGpkgConfig {
+  name: string;
+  path: string;
+  tableName: string;
+  resampling: string;
+  tilingScheme: string;
 }

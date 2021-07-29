@@ -13,17 +13,15 @@ import { intersect } from './common/utils';
 export class MainLoop {
   private readonly config: IConfig;
   private readonly logger: Logger;
-  private readonly db: Gpkg;
-  private readonly worker: Worker;
+  private db?: Gpkg;
+  private worker?: Worker;
   private readonly geohash: GeoHash;
   private readonly input: IInput;
 
   public constructor(input: IInput) {
     this.config = container.resolve(Services.CONFIG);
     this.logger = container.resolve(Services.LOGGER);
-    this.db = container.resolve(Services.DB);
-    this.worker = container.resolve(Services.WORKER);
-    this.geohash = container.resolve(Services.GEOHASH);
+    this.geohash = new GeoHash();
     this.input = input;
   }
 
@@ -35,6 +33,11 @@ export class MainLoop {
     const intersection = intersect(this.input.footprint, this.input.bbox);
     const features: Feature[] = (await this.geohash.geojson2geohash(intersection)).map((geohash: string) => this.geohash.decode(geohash));
     const intersectionBbox: BBox2d = polygonToBBox(intersection) as BBox2d;
+
+    this.db = new Gpkg(gpkgFullPath, intersectionBbox, this.input.zoomLevel);
+
+    this.logger.info(`Creating new GPKG`);
+    this.worker = new Worker(this.db);
 
     this.logger.info(`Updating DB extents`);
     this.worker.updateExtent(intersectionBbox, this.input.zoomLevel);

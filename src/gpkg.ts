@@ -1,27 +1,36 @@
+import { execSync } from 'child_process';
 import Database, { Database as SQLiteDB } from 'better-sqlite3';
 import { Logger } from '@map-colonies/js-logger';
-import { container, singleton } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 import { IConfig } from 'config';
+import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import { Services } from './common/constants';
-import { Tile } from './common/interfaces';
+import { IGpkgConfig } from './common/interfaces';
+import { gpkgSize } from './common/utils';
+import { Tile } from './tile';
 
-@singleton()
+@injectable()
 export class Gpkg {
   public path: string;
   private readonly logger: Logger;
   private readonly db: SQLiteDB;
   private readonly config: IConfig;
+  private readonly extent: BBox2d;
+  private readonly maxZoomLevel: number;
 
-  public constructor(path: string) {
+  public constructor(path: string, extent: BBox2d, zoomLevel: number) {
+    this.path = path;
+    this.extent = extent;
+    this.maxZoomLevel = zoomLevel;
     this.logger = container.resolve(Services.LOGGER);
     this.config = container.resolve(Services.CONFIG);
     this.logger.info(`Opening GPKG in path ${path}`);
-    this.db = new Database(path);
-    this.path = path;
+    this.create();
+    this.db = new Database(`${path}`, { fileMustExist: true });
   }
 
   public insertTiles(tiles: Tile[]): void {
-    const tableName = this.config.get<string>('gpkg.table_name');
+    const tableName = this.config.get<string>('gpkg.tableName');
     const sql = `INSERT OR IGNORE INTO ${tableName} (tile_column, tile_row, zoom_level, tile_data) VALUES (@x, @y, @z, @tileData)`;
     const statement = this.db.prepare(sql);
     this.db
@@ -34,7 +43,7 @@ export class Gpkg {
       .call(tiles);
   }
 
-  public runStatement(sql: string, params: any): void {
+  public runStatement(sql: string, params: unknown): void {
     this.logger.info(`Executing query ${sql} with params: ${JSON.stringify(params)} on DB ${this.path}`);
     const statement = this.db.prepare(sql);
     statement.run(params);
@@ -48,5 +57,20 @@ export class Gpkg {
   public close(): void {
     this.logger.info(`Closing GPKG in path ${this.path}`);
     this.db.close();
+  }
+
+  private create(): void {
+    const gpkg = this.config.get<IGpkgConfig>('gpkg');
+    const gpkgFullPath = `${gpkg.path}/${gpkg.name}.gpkg`;
+    const [outsizeX, outsizeY] = gpkgSize(this.extent, this.maxZoomLevel);
+
+    const command = `gdal_create -outsize ${outsizeX} ${outsizeY} -a_ullr ${this.extent[0]} ${this.extent[3]} ${this.extent[2]} ${this.extent[1]} \
+                    -co TILING_SCHEME=${gpkg.tilingScheme} \
+                    -co RASTER_TABLE=${gpkg.tableName} \
+                    -co RASTER_IDENTIFIER=${gpkg.tableName} \
+                    -co ADD_GPKG_OGR_CONTENTS=NO ${gpkgFullPath}`;
+
+    this.logger.info(`Creating a new GPKG with the command: ${command}`);
+    execSync(command);
   }
 }

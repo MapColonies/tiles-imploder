@@ -4,9 +4,10 @@ The goal is to cut a specific bounding box from a raster layer footprint (GeoJSO
 # Usage
 The service listens to a queue, once a message is recevied the work then immediately start.
 ###  For local development
-Clone the repository, hit `npm install` & `npm start`. Make sure you have your configurations set right. **Make sure you are running GDAL >= 3.2.0**.
+Clone the repository, hit `npm install` & `npm start`. Make sure you have your configurations set right. 
+* **Make sure you are running GDAL >= 3.2.0**.
 ###  Docker
-Clone the repository, hit `npm install` & `npm start`. Make sure you have your configurations set right. **Make sure you are running GDAL >= 3.2.0**.
+Build an image with the provided `Dockerfile`, then run it.
 
 # Environment Variables
 **Service Specific**

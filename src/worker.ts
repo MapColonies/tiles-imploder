@@ -17,28 +17,10 @@ export class Worker {
   private readonly config: IConfig;
   private readonly db: Gpkg;
 
-  public constructor() {
+  public constructor(db: Gpkg) {
     this.logger = container.resolve(Services.LOGGER);
     this.config = container.resolve(Services.CONFIG);
-    this.db = container.resolve(Services.DB);
-  }
-
-  public async createGpkg(): Promise<void> {
-    const gpkgPath = this.config.get<string>('gpkg.path');
-    const gpkgName = this.config.get<string>('gpkg.name');
-    const gpkgFullPath = `${gpkgPath}/${gpkgName}.gpkg`;
-
-    const promiseExec = promisify(exec);
-    const command = ``;
-
-    const { stdout, stderr } = await promiseExec(command);
-
-    if (stderr) {
-      throw new Error(stderr);
-    }
-    if (stdout) {
-      this.logger.info(stdout);
-    }
+    this.db = db;
   }
 
   public async populate(features: Feature[], maxZoomLevel: number): Promise<void> {
@@ -66,9 +48,7 @@ export class Worker {
     const resamplingMethod = this.config.get<string>('gpkg.resampling');
 
     const overviews = this.calculateOverviews(bbox, zoomLevel);
-    const command = `gdaladdo --config GDAL_CACHEMAX 1500 --config COMPRESS_OVERVIEW DEFLATE  -r ${resamplingMethod} ${gpkgFullPath} ${overviews.join(
-      ' '
-    )}`;
+    const command = `gdaladdo  -r ${resamplingMethod} ${gpkgFullPath} ${overviews.join(' ')}`;
 
     this.logger.info(`Building overviews with command: ${command}`);
     const { stdout, stderr } = await promiseExec(command);

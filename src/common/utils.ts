@@ -3,21 +3,22 @@ import turfBBoxPolygon from '@turf/bbox-polygon';
 import turfLineStringToPolygon from '@turf/line-to-polygon';
 import { Geometry, Feature, Polygon, MultiPolygon, LineString, feature as turfFeature } from '@turf/helpers';
 import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
-import { COORDINATE_SYSTEM } from './constants';
-import { Tile, Coordinate } from './interfaces';
+import { Tile } from '../tile';
+import { COORDINATE_SYSTEM, TILE_AXIS_SIZE } from './constants';
+import { Coordinate } from './interfaces';
 
 let cacheZoomLevel: number;
 
 export function getTileResolution(zoomLevel: number): number {
   if (cacheZoomLevel !== zoomLevel) {
-    cacheZoomLevel = COORDINATE_SYSTEM.MAX_LON / (1 << zoomLevel);
+    cacheZoomLevel = COORDINATE_SYSTEM.maxLon / (1 << zoomLevel);
   }
   return cacheZoomLevel;
 }
 
 export function getPixelResolution(zoomLevel: number): number {
   const tileRes = getTileResolution(zoomLevel);
-  return tileRes / 256;
+  return tileRes / TILE_AXIS_SIZE;
 }
 
 export function snapBBoxToTileGrid(bbox: BBox2d, zoomLevel: number): BBox2d {
@@ -36,24 +37,34 @@ export function snapBBoxToTileGrid(bbox: BBox2d, zoomLevel: number): BBox2d {
   return bbox;
 }
 
+export function snapMinCord(cord: number, tileRes: number): number {
+  return cord - Math.abs(cord % tileRes);
+}
+
+export function gpkgSize(bbox: BBox2d, zoomLevel: number): [number, number] {
+  const extent = snapBBoxToTileGrid(bbox, zoomLevel);
+  const pixelRes = getPixelResolution(zoomLevel);
+
+  const outsizeX = (extent[2] - extent[0]) / pixelRes;
+  const outsizeY = (extent[3] - extent[1]) / pixelRes;
+
+  return [outsizeX, outsizeY];
+}
+
 export function toBBox(minTile: Tile, maxTile: Tile): [Coordinate, Coordinate] {
   if (minTile.z !== maxTile.z) {
     throw new Error(`Could not calcualte bbox from tiles due to not matching zoom levels`);
   }
   const res = getTileResolution(minTile.z);
-  const minLon = minTile.x * res - COORDINATE_SYSTEM.MAX_LON;
-  const minLat = minTile.y * res - COORDINATE_SYSTEM.MAX_LAT;
-  const maxLon = (maxTile.x + 1) * res - COORDINATE_SYSTEM.MAX_LON;
-  const maxLat = (maxTile.y + 1) * res - COORDINATE_SYSTEM.MAX_LAT;
+  const minLon = minTile.x * res - COORDINATE_SYSTEM.maxLon;
+  const minLat = minTile.y * res - COORDINATE_SYSTEM.maxLat;
+  const maxLon = (maxTile.x + 1) * res - COORDINATE_SYSTEM.maxLon;
+  const maxLat = (maxTile.y + 1) * res - COORDINATE_SYSTEM.maxLat;
 
   return [
     { lon: minLon, lat: minLat },
     { lon: maxLon, lat: maxLat },
   ];
-}
-
-function snapMinCord(cord: number, tileRes: number): number {
-  return cord - Math.abs(cord % tileRes);
 }
 
 export function intersect(footprint: Geometry, bbox: BBox2d | true): Feature<Polygon | MultiPolygon> {

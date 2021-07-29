@@ -32,8 +32,9 @@
   "gpkg": {
     "name": "dme",
     "path": "/etc",
-    "table_name": "dummy",
-    "resampling": "bilinear"
+    "tableName": "dummy",
+    "resampling": "bilinear",
+    "tilingScheme": "InspireCRS84Quad"
   },
   "batch": {
     "size": 15
