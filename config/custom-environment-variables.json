@@ -38,5 +38,22 @@
         }
       }
     }
+  },
+  "tilesDirectoryPath": "TILES_DIR_PATH",
+  "geohash": {
+    "precision": {
+      "__name": "GEOHASH_PRECISION",
+      "__format": "number"
+    }
+  },
+  "gpkg": {
+    "name": "GPKG_NAME",
+    "path": "GPKG_PATH",
+    "table_name": "GPKG_TABLE_NAME",
+    "resampling": "GPKG_RESAMPLING"
+  },
+  "batch": {
+    "__name": "BATCH_SIZE",
+    "__format": "number"
   }
 }

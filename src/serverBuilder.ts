@@ -4,12 +4,13 @@ import compression from 'compression';
 import { OpenapiViewerRouter, OpenapiRouterConfig } from '@map-colonies/openapi-express-viewer';
 import { getErrorHandlerMiddleware } from '@map-colonies/error-express-handler';
 import { middleware as OpenApiMiddleware } from 'express-openapi-validator';
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import httpLogger from '@map-colonies/express-access-log-middleware';
+import { BBox2d, MultiPolygon, Polygon } from '@turf/helpers/dist/js/lib/geojson';
 import { Services } from './common/constants';
-import { IConfig } from './common/interfaces';
-import { resourceNameRouterFactory } from './resourceName/routes/resourceNameRouter';
+import { IConfig, IInput } from './common/interfaces';
+import { MainLoop } from './mainLoop';
 
 @injectable()
 export class ServerBuilder {
@@ -24,6 +25,24 @@ export class ServerBuilder {
     this.buildRoutes();
     this.registerPostRoutesMiddleware();
 
+    /* eslint-disable */
+    const footprint = JSON.parse(require('fs').readFileSync('/home/roees/Documents/gpkgs/exporter/artzi/footprint.json').toString()) as
+      | Polygon
+      | MultiPolygon;
+    const bbox: BBox2d = [34.523683, 31.154838, 34.541715, 31.169632];
+    const all = true;
+    // const bboxNEW: BBox2d = [34.612207,31.084028, 34.630013,31.098109];
+    const maxZoomLevel = 15;
+    const input: IInput = { footprint, bbox: all, zoomLevel: maxZoomLevel };
+    /* eslint-enable */
+
+    new MainLoop(input)
+      .run()
+      .then(() => this.logger.info(`Succesfully populated GPKG with tiles`))
+      .catch((err: Error) => {
+        this.logger.error('Error occured while trying to populate GPKG: ' + JSON.stringify(err, Object.getOwnPropertyNames(err)));
+      });
+
     return this.serverInstance;
   }
 
@@ -34,7 +53,6 @@ export class ServerBuilder {
   }
 
   private buildRoutes(): void {
-    this.serverInstance.use('/resourceName', resourceNameRouterFactory(container));
     this.buildDocsRoutes();
   }
 

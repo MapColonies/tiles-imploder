@@ -10,4 +10,17 @@ export enum Services {
   CONFIG = 'IConfig',
   TRACER = 'TRACER',
   METER = 'METER',
+  DB = 'DB',
+  WORKER = 'WORKER',
+  GEOHASH = 'GEOHASH',
 }
+
+export const MIN_PIXEL_RESOLUTION = 0.703125;
+export const TILE_HEIGHT = 256,
+  TILE_WIDTH = 256;
+export const COORDINATE_SYSTEM = {
+  MAX_LAT: 90,
+  MIN_LAT: -90,
+  MAX_LON: 180,
+  MIN_LON: -180,
+};

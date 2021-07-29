@@ -24,5 +24,18 @@
         "options": null
       }
     }
+  },
+  "tilesDirectoryPath": "/etc/tiles",
+  "geohash": {
+    "precision": 7
+  },
+  "gpkg": {
+    "name": "dme",
+    "path": "/etc",
+    "table_name": "dummy",
+    "resampling": "bilinear"
+  },
+  "batch": {
+    "size": 15
   }
 }
