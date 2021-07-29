@@ -10,9 +10,6 @@ export enum Services {
   CONFIG = 'IConfig',
   TRACER = 'TRACER',
   METER = 'METER',
-  DB = 'DB',
-  WORKER = 'WORKER',
-  GEOHASH = 'GEOHASH',
 }
 
 export const MIN_PIXEL_RESOLUTION = 0.703125;
