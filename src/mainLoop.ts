@@ -4,7 +4,7 @@ import { IConfig } from 'config';
 import { container } from 'tsyringe';
 import polygonToBBox from '@turf/bbox';
 import { Services } from './common/constants';
-import { IInput } from './common/interfaces';
+import { IGpkgConfig, IInput } from './common/interfaces';
 import { GeoHash } from './geohash/geohash';
 import { Gpkg } from './gpkg';
 import { Worker } from './worker';
@@ -17,18 +17,18 @@ export class MainLoop {
   private worker?: Worker;
   private readonly geohash: GeoHash;
   private readonly input: IInput;
+  private readonly gpkgConfig: IGpkgConfig;
 
   public constructor(input: IInput) {
     this.config = container.resolve(Services.CONFIG);
     this.logger = container.resolve(Services.LOGGER);
     this.geohash = new GeoHash();
     this.input = input;
+    this.gpkgConfig = this.config.get<IGpkgConfig>('gpkg');
   }
 
   public async run(): Promise<void> {
-    const gpkgPath = this.config.get<string>('gpkg.path');
-    const gpkgName = this.config.get<string>('gpkg.name');
-    const gpkgFullPath = `${gpkgPath}/${gpkgName}.gpkg`;
+    const gpkgFullPath = `${this.gpkgConfig.path}/${this.gpkgConfig.name}.gpkg`;
 
     const intersection = intersect(this.input.footprint, this.input.bbox);
     const features: Feature[] = (await this.geohash.geojson2geohash(intersection)).map((geohash: string) => this.geohash.decode(geohash));

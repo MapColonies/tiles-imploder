@@ -17,6 +17,7 @@ export class Gpkg {
   private readonly config: IConfig;
   private readonly extent: BBox2d;
   private readonly maxZoomLevel: number;
+  private readonly gpkgConfig: IGpkgConfig;
 
   public constructor(path: string, extent: BBox2d, zoomLevel: number) {
     this.path = path;
@@ -27,6 +28,7 @@ export class Gpkg {
     this.logger.info(`Opening GPKG in path ${path}`);
     this.create();
     this.db = new Database(`${path}`, { fileMustExist: true });
+    this.gpkgConfig = this.config.get<IGpkgConfig>('gpkg');
   }
 
   public insertTiles(tiles: Tile[]): void {
@@ -60,14 +62,13 @@ export class Gpkg {
   }
 
   private create(): void {
-    const gpkg = this.config.get<IGpkgConfig>('gpkg');
-    const gpkgFullPath = `${gpkg.path}/${gpkg.name}.gpkg`;
+    const gpkgFullPath = `${this.gpkgConfig.path}/${this.gpkgConfig.name}.gpkg`;
     const [outsizeX, outsizeY] = gpkgSize(this.extent, this.maxZoomLevel);
 
     const command = `gdal_create -outsize ${outsizeX} ${outsizeY} -a_ullr ${this.extent[0]} ${this.extent[3]} ${this.extent[2]} ${this.extent[1]} \
-                    -co TILING_SCHEME=${gpkg.tilingScheme} \
-                    -co RASTER_TABLE=${gpkg.tableName} \
-                    -co RASTER_IDENTIFIER=${gpkg.tableName} \
+                    -co TILING_SCHEME=${this.gpkgConfig.tilingScheme} \
+                    -co RASTER_TABLE=${this.gpkgConfig.tableName} \
+                    -co RASTER_IDENTIFIER=${this.gpkgConfig.tableName} \
                     -co ADD_GPKG_OGR_CONTENTS=NO ${gpkgFullPath}`;
 
     this.logger.info(`Creating a new GPKG with the command: ${command}`);

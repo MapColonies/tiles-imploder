@@ -1,11 +1,11 @@
 import { promises as fsPromise } from 'fs';
 import { IConfig } from 'config';
-import { container, singleton } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import { Services } from './common/constants';
 import { Tile } from './tile';
 
-@singleton()
+@injectable()
 export class TileGenerator {
   public generator: AsyncGenerator<Tile>;
   private readonly config: IConfig;
@@ -14,6 +14,7 @@ export class TileGenerator {
   private tilesCount: number;
   private readonly start: Tile;
   private readonly end: Tile;
+  private readonly tilesDirectory: string;
 
   public constructor(startTile: Tile, endTile: Tile) {
     this.start = startTile;
@@ -23,6 +24,7 @@ export class TileGenerator {
     this.generator = this.generate();
     this.config = container.resolve(Services.CONFIG);
     this.logger = container.resolve(Services.LOGGER);
+    this.tilesDirectory = this.config.get<string>('tilesDirectoryPath');
   }
 
   private async *generate(): AsyncGenerator<Tile> {
@@ -34,12 +36,11 @@ export class TileGenerator {
 
     const zoom = this.start.z;
     const tilesInZoomLevel = this.tilesCountForZoomLevel(zoom);
-    const location = this.config.get<string>('tilesDirectoryPath');
 
     for (let x = minX; x <= maxX; x++) {
       for (let upperLeftY = minY; upperLeftY <= maxY; upperLeftY++) {
         const lowerLeftY = tilesInZoomLevel - upperLeftY;
-        const blob = await fsPromise.readFile(`${location}/${zoom}/${x}/${upperLeftY}.png`);
+        const blob = await fsPromise.readFile(`${this.tilesDirectory}/${zoom}/${x}/${upperLeftY}.png`);
         yield { z: zoom, x, y: lowerLeftY, tileData: blob };
       }
     }

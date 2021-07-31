@@ -27,12 +27,8 @@ export class ServerBuilder {
 
     /* eslint-disable */
     // TODO: REPLACE WITH REAL DATA FROM QUEUE
-    const footprint = JSON.parse(require('fs').readFileSync('/home/roees/Documents/gpkgs/exporter/artzi/footprint.json').toString()) as
-      | Polygon
-      | MultiPolygon;
+    const footprint = JSON.parse(require('fs').readFileSync('footprint.json').toString()) as Polygon | MultiPolygon;
     const bbox: BBox2d = [34.65302, 31.10011, 34.54882, 31.05992];
-    const all = true;
-    // const bboxNEW: BBox2d = [34.612207,31.084028, 34.630013,31.098109];
     const maxZoomLevel = 15;
     const input: IInput = { footprint, bbox, zoomLevel: maxZoomLevel };
     /* eslint-enable */

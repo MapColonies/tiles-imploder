@@ -16,11 +16,13 @@ export class Worker {
   private readonly logger: Logger;
   private readonly config: IConfig;
   private readonly db: Gpkg;
+  private readonly batchSize: number;
 
   public constructor(db: Gpkg) {
     this.logger = container.resolve(Services.LOGGER);
     this.config = container.resolve(Services.CONFIG);
     this.db = db;
+    this.batchSize = this.config.get<number>('batch.size');
   }
 
   public async populate(features: Feature[], maxZoomLevel: number): Promise<void> {
@@ -69,12 +71,11 @@ export class Worker {
   }
 
   private async handleBatch(tileGenerator: AsyncGenerator<Tile>): Promise<void> {
-    const batchSize = this.config.get<number>('batch.size');
     let tilesBatch: Tile[] = [];
 
     for await (const currentTile of tileGenerator) {
       tilesBatch.push(currentTile);
-      if (tilesBatch.length === batchSize) {
+      if (tilesBatch.length === this.batchSize) {
         this.db.insertTiles(tilesBatch);
         tilesBatch = [];
       }

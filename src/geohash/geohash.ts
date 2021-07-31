@@ -15,10 +15,12 @@ const shape2geohash = require('shape2geohash');
 export class GeoHash {
   private readonly config: IConfig;
   private readonly geohashes: string[];
+  private readonly geohashPrecision: number;
 
   public constructor() {
     this.geohashes = [];
     this.config = container.resolve(Services.CONFIG);
+    this.geohashPrecision = this.config.get<number>('geohash.precision');
   }
 
   public async geojson2geohash(geojson: Feature<Polygon | MultiPolygon>): Promise<string[]> {
@@ -30,9 +32,8 @@ export class GeoHash {
       },
     });
 
-    const precision = this.config.get<number>('geohash.precision');
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    await shape2geohash(geojson, { precision, customWriter });
+    await shape2geohash(geojson, { precision: this.geohashPrecision, customWriter });
     return this.geohashes;
   }
 
