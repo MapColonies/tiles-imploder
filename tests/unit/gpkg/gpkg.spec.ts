@@ -25,22 +25,4 @@ describe('gpkg', () => {
     createFn.mockReset();
     createFn.mockRestore();
   });
-
-  it('should call exec method while trying to COMMIT', () => {
-    const gpkg = new Gpkg(mockPath, mockBBox, mockZoomLevel);
-    gpkg.commit();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const dbExec = gpkg.db.exec.bind(gpkg);
-    expect(dbExec).toHaveBeenCalledTimes(1);
-  });
-
-  it('should call CLOSE on DB', () => {
-    const gpkg = new Gpkg(mockPath, mockBBox, mockZoomLevel);
-    gpkg.close();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const dbClose = gpkg.db.close.bind(gpkg);
-    expect(dbClose).toHaveBeenCalledTimes(1);
-  });
 });
