@@ -30,7 +30,7 @@ export class Tile {
   }
 
   public toString(): string {
-    const { tileData, ...rest } = this;
-    return rest.toString();
+    const thisTile = { x: this.x, y: this.y, z: this.z };
+    return JSON.stringify(thisTile);
   }
 }

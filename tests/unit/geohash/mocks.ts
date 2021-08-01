@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers*/
 export const geohashString = 'gbsuv7z';
 export const expectedDecodedGeohash = {
   type: 'Feature',
