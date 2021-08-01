@@ -5,6 +5,7 @@ import { Gpkg } from '../../../src/gpkg';
 import { mockBBox, mockPath, mockZoomLevel } from './mocks';
 
 jest.mock('better-sqlite3');
+jest.mock('child_process');
 
 describe('gpkg', () => {
   container.register(Services.LOGGER, { useValue: { log: jest.fn(), info: jest.fn(), error: jest.fn(), debug: jest.fn() } });
