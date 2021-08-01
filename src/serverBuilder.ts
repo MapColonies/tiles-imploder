@@ -1,9 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import compression from 'compression';
-import { OpenapiViewerRouter, OpenapiRouterConfig } from '@map-colonies/openapi-express-viewer';
 import { getErrorHandlerMiddleware } from '@map-colonies/error-express-handler';
-import { middleware as OpenApiMiddleware } from 'express-openapi-validator';
 import { inject, injectable } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import httpLogger from '@map-colonies/express-access-log-middleware';
@@ -22,12 +20,11 @@ export class ServerBuilder {
 
   public build(): express.Application {
     this.registerPreRoutesMiddleware();
-    this.buildRoutes();
     this.registerPostRoutesMiddleware();
 
     /* eslint-disable */
     // TODO: REPLACE WITH REAL DATA FROM QUEUE
-    const footprint = JSON.parse(require('fs').readFileSync('footprint.json').toString()) as Polygon | MultiPolygon;
+    const footprint = JSON.parse(require('fs').readFileSync('/footprints/footprint.json').toString()) as Polygon | MultiPolygon;
     const bbox: BBox2d = [34.65302, 31.10011, 34.54882, 31.05992];
     const maxZoomLevel = 15;
     const input: IInput = { footprint, bbox, zoomLevel: maxZoomLevel };
@@ -43,16 +40,6 @@ export class ServerBuilder {
     return this.serverInstance;
   }
 
-  private buildDocsRoutes(): void {
-    const openapiRouter = new OpenapiViewerRouter(this.config.get<OpenapiRouterConfig>('openapiConfig'));
-    openapiRouter.setup();
-    this.serverInstance.use(this.config.get<string>('openapiConfig.basePath'), openapiRouter.getRouter());
-  }
-
-  private buildRoutes(): void {
-    this.buildDocsRoutes();
-  }
-
   private registerPreRoutesMiddleware(): void {
     this.serverInstance.use(httpLogger({ logger: this.logger }));
 
@@ -61,10 +48,6 @@ export class ServerBuilder {
     }
 
     this.serverInstance.use(bodyParser.json(this.config.get<bodyParser.Options>('server.request.payload')));
-
-    const ignorePathRegex = new RegExp(`^${this.config.get<string>('openapiConfig.basePath')}/.*`, 'i');
-    const apiSpecPath = this.config.get<string>('openapiConfig.filePath');
-    this.serverInstance.use(OpenApiMiddleware({ apiSpec: apiSpecPath, validateRequests: true, ignorePaths: ignorePathRegex }));
   }
 
   private registerPostRoutesMiddleware(): void {

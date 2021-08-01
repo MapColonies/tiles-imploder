@@ -9,9 +9,12 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-FROM node:12.20.1-alpine3.9 as production
+FROM osgeo/gdal:ubuntu-small-3.3.0
 
-RUN apk add dumb-init
+RUN apt-get update
+RUN apt-get install -y sqlite3 libsqlite3-dev
+RUN apt-get install -y nodejs npm
+RUN apt-get install -y dumb-init
 
 ENV NODE_ENV=production
 ENV SERVER_PORT=8080
@@ -19,14 +22,14 @@ ENV SERVER_PORT=8080
 
 WORKDIR /usr/src/app
 
-COPY --chown=node:node package*.json ./
+COPY package*.json ./
 
 RUN npm ci --only=production
 
-COPY --chown=node:node --from=build /tmp/buildApp/dist .
-COPY --chown=node:node ./config ./config
+COPY --from=build /tmp/buildApp/dist .
+COPY  ./config ./config
 
 
-USER node
+# USER node
 EXPOSE 8080
 CMD ["dumb-init", "node", "--max_old_space_size=512", "./index.js"]

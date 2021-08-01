@@ -19,9 +19,6 @@ Build an image with the provided `Dockerfile`, then run it.
 * GPKG_RESAMPLING - resampling method for building overviews. 
 * BATCH_SIZE - Number of records to insert to the `.gpkg` in one transaction.
 
-**OpenAPI**
-* OPENAPI_FILE_PATH
-
 **Telemetry**
 * TELEMETRY_SERVICE_NAME
 * TELEMETRY_HOST_NAME
