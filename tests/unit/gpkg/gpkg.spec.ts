@@ -24,7 +24,7 @@ describe('gpkg', () => {
     jest.clearAllMocks();
   });
 
-  it('should call the create method once initaing a ne instance', () => {
+  it('should call the create method once initaing a new instance', () => {
     const createFn = jest.spyOn((Gpkg.prototype as unknown) as { create: () => void }, 'create');
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const gpkg = new Gpkg(mockPath, mockBBox, mockZoomLevel);
