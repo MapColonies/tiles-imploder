@@ -2,7 +2,7 @@ import { promises as fsPromise } from 'fs';
 import { IConfig } from 'config';
 import { container, injectable } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
-import { Services } from './common/constants';
+import { Services } from '../common/constants';
 import { Tile } from './tile';
 
 @injectable()

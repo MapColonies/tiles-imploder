@@ -16,6 +16,8 @@ RUN apt-get install -y sqlite3 libsqlite3-dev
 RUN apt-get install -y nodejs npm
 RUN apt-get install -y dumb-init
 
+RUN useradd -U node -s /bin/bash
+
 ENV NODE_ENV=production
 ENV SERVER_PORT=8080
 
@@ -30,6 +32,6 @@ COPY --from=build /tmp/buildApp/dist .
 COPY  ./config ./config
 
 
-# USER node
+USER node
 EXPOSE 8080
 CMD ["dumb-init", "node", "--max_old_space_size=512", "./index.js"]

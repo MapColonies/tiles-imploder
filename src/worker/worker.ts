@@ -5,11 +5,11 @@ import { Logger } from '@map-colonies/js-logger';
 import { container, injectable } from 'tsyringe';
 import { IConfig } from 'config';
 import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
-import { Gpkg } from './gpkg';
-import { Services } from './common/constants';
-import { Tile } from './tile';
-import { TileGenerator } from './tilesGenerator';
-import { getPixelResolution, snapBBoxToTileGrid } from './common/utils';
+import { Gpkg } from '../gpkg/gpkg';
+import { Services } from '../common/constants';
+import { Tile } from '../tiles/tile';
+import { TileGenerator } from '../tiles/tilesGenerator';
+import { getPixelResolution, snapBBoxToTileGrid } from '../common/utils';
 
 @injectable()
 export class Worker {

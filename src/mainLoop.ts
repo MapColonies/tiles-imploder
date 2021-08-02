@@ -6,8 +6,8 @@ import polygonToBBox from '@turf/bbox';
 import { Services } from './common/constants';
 import { IGpkgConfig, IInput } from './common/interfaces';
 import { GeoHash } from './geohash/geohash';
-import { Gpkg } from './gpkg';
-import { Worker } from './worker';
+import { Gpkg } from './gpkg/gpkg';
+import { Worker } from './worker/worker';
 import { intersect } from './common/utils';
 
 export class MainLoop {

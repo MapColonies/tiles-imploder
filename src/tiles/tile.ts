@@ -1,5 +1,5 @@
-import { Coordinate } from './common/interfaces';
-import { getTileResolution } from './common/utils';
+import { Coordinate } from '../common/interfaces';
+import { getTileResolution } from '../common/utils';
 
 export class Tile {
   public readonly x: number;

@@ -1,29 +1,54 @@
 import { container } from 'tsyringe';
 import config from 'config';
+import { Database as SQLiteDB } from 'better-sqlite3';
 import { Services } from '../../../src/common/constants';
-import { Gpkg } from '../../../src/gpkg';
-import { mockBBox, mockPath, mockZoomLevel } from './mocks';
+import { Gpkg } from '../../../src/gpkg/gpkg';
+import { mockBBox, mockPath, mockZoomLevel } from '../mockData';
 
+jest.mock('child_process', () => {
+  return {
+    execSync: jest.fn(),
+  };
+});
 jest.mock('better-sqlite3');
-jest.mock('child_process');
 
 describe('gpkg', () => {
-  container.register(Services.LOGGER, { useValue: { log: jest.fn(), info: jest.fn(), error: jest.fn(), debug: jest.fn() } });
-  container.register(Services.CONFIG, { useValue: config });
-
   beforeEach(() => {
+    container.register(Services.LOGGER, { useValue: { log: jest.fn(), info: jest.fn(), error: jest.fn(), debug: jest.fn() } });
+    container.register(Services.CONFIG, { useValue: config });
+  });
+
+  afterEach(() => {
+    container.reset();
+    container.clearInstances();
     jest.clearAllMocks();
   });
 
   it('should call the create method once initaing a ne instance', () => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const createFn = jest.spyOn(Gpkg.prototype, 'create');
+    const createFn = jest.spyOn((Gpkg.prototype as unknown) as { create: () => void }, 'create');
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const gpkg = new Gpkg(mockPath, mockBBox, mockZoomLevel);
     expect(createFn).toHaveBeenCalledTimes(1);
 
     createFn.mockReset();
     createFn.mockRestore();
+  });
+
+  it('should call EXEC when trying to COMMIT', () => {
+    jest.mock('better-sqlite3');
+
+    const gpkg = new Gpkg(mockPath, mockBBox, mockZoomLevel);
+    const execSpy = jest.spyOn(((gpkg as unknown) as { db: SQLiteDB }).db, 'exec');
+
+    gpkg.commit();
+    expect(execSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should call CLOSE when trying to CLOSE', () => {
+    const gpkg = new Gpkg(mockPath, mockBBox, mockZoomLevel);
+    const closeSpy = jest.spyOn(((gpkg as unknown) as { db: SQLiteDB }).db, 'close');
+
+    gpkg.close();
+    expect(closeSpy).toHaveBeenCalledTimes(1);
   });
 });
