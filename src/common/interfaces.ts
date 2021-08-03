@@ -15,6 +15,7 @@ export interface IInput {
   footprint: Polygon | MultiPolygon;
   bbox: BBox2d | true;
   zoomLevel: number;
+  tilesFullPath: string;
 }
 
 export interface IGpkgConfig {

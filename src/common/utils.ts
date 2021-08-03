@@ -6,6 +6,8 @@ import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import { Tile } from '../tiles/tile';
 import { COORDINATE_SYSTEM, TILE_AXIS_SIZE } from './constants';
 import { Coordinate } from './interfaces';
+import { ITaskResponse } from '@map-colonies/mc-priority-queue';
+import config from 'config';
 
 let cacheZoomLevel: number;
 
@@ -94,4 +96,9 @@ export function intersect(footprint: Geometry, bbox: BBox2d | true): Feature<Pol
     throw new Error('ERROR: Intersection failed - no overlapping areas found.');
   }
   return intersection;
+}
+
+export function hasMaxAttemps(attempts: number): boolean {
+  const maxAttempts = config.get<number>('maxAttempts');
+  return attempts >= maxAttempts;
 }

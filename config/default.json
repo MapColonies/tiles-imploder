@@ -19,13 +19,14 @@
       }
     }
   },
-  "tilesDirectoryPath": "/etc/tiles",
+  "tilesDirectoryPath": "/home/shlomiko/Downloads",
+  "maxAttempts": 3,
   "geohash": {
     "precision": 7
   },
   "gpkg": {
     "name": "dme",
-    "path": "/etc",
+    "path": "/home/shlomiko/Desktop",
     "tableName": "dummy",
     "resampling": "bilinear",
     "tilingScheme": "InspireCRS84Quad"

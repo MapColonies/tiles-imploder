@@ -41,11 +41,11 @@ export class MainLoop {
 
     this.logger.info(`Updating DB extents`);
     this.worker.updateExtent(intersectionBbox, this.input.zoomLevel);
-
+    throw new Error('RIK LO MSHANE SIEIE MASHEO');
     this.logger.info(`Populating ${gpkgFullPath} with bbox ${JSON.stringify(this.input.bbox)} until zoom level ${this.input.zoomLevel}`);
-    await this.worker.populate(features, this.input.zoomLevel);
+    // await this.worker.populate(features, this.input.zoomLevel, this.input.tilesFullPath);
 
     this.logger.info(`Building overviews in ${gpkgFullPath}`);
-    await this.worker.buildOverviews(intersectionBbox, this.input.zoomLevel);
+    // await this.worker.buildOverviews(intersectionBbox, this.input.zoomLevel);
   }
 }

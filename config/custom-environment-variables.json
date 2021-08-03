@@ -37,6 +37,10 @@
     }
   },
   "tilesDirectoryPath": "TILES_DIR_PATH",
+  "maxAttempts": {
+    "__name": "MAX_ATTEMPTS",
+    "__format": "number"
+  },
   "geohash": {
     "precision": {
       "__name": "GEOHASH_PRECISION",
