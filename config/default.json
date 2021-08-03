@@ -1,10 +1,4 @@
 {
-  "openapiConfig": {
-    "filePath": "./openapi3.yaml",
-    "basePath": "/docs",
-    "rawPath": "/api",
-    "uiPath": "/api"
-  },
   "telemetry": {
     "logger": {
       "level": "info",
@@ -24,5 +18,19 @@
         "options": null
       }
     }
+  },
+  "tilesDirectoryPath": "/etc/tiles",
+  "geohash": {
+    "precision": 7
+  },
+  "gpkg": {
+    "name": "dme",
+    "path": "/etc",
+    "tableName": "dummy",
+    "resampling": "bilinear",
+    "tilingScheme": "InspireCRS84Quad"
+  },
+  "batch": {
+    "size": 15
   }
 }

@@ -1,122 +1,39 @@
-# Map Colonies typescript service template
+# Tiles Imploder
+The goal is to cut a specific bounding box from a raster layer footprint (GeoJSON) and populate the result into a target `.gpkg` file.
 
-----------------------------------
+# Usage
+The service listens to a queue, once a message is recevied the work then immediately start.
+###  For local development
+Clone the repository, hit `npm install` & `npm start`. Make sure you have your configurations set right. 
+* **Make sure you are running GDAL >= 3.2.0**.
+###  Docker
+Build an image with the provided `Dockerfile`, then run it.
 
-![badge-alerts-lgtm](https://img.shields.io/lgtm/alerts/github/MapColonies/ts-server-boilerplate?style=for-the-badge)
+# Environment Variables
+**Service Specific**
+* TILES_DIR_PATH - the directory on the filesystem where tiles are located
+* GEOHASH_PRECISION - the precision of the geohash.
+* GPKG_NAME - the name of the database.
+* GPKG_PATH - full path of the directory that holds the gpkg.
+* GPKG_TABLE_NAME - the table name of the where tiles are stored.
+* GPKG_RESAMPLING - resampling method for building overviews. 
+* BATCH_SIZE - Number of records to insert to the `.gpkg` in one transaction.
 
-![grade-badge-lgtm](https://img.shields.io/lgtm/grade/javascript/github/MapColonies/ts-server-boilerplate?style=for-the-badge)
+**Telemetry**
+* TELEMETRY_SERVICE_NAME
+* TELEMETRY_HOST_NAME
+* TELEMETRY_SERVICE_VERSION
+* TELEMETRY_TRACING_ENABLED
+* TELEMETRY_TRACING_URL
+* TELEMETRY_METRICS_ENABLED
+* TELEMETRY_METRICS_URL
+* TELEMETRY_METRICS_INTERVAL
 
-![snyk](https://img.shields.io/snyk/vulnerabilities/github/MapColonies/ts-server-boilerplate?style=for-the-badge)
+**Logging**
+* LOG_LEVEL
+* LOG_PRETTY_PRINT_ENABLED
 
-----------------------------------
-
-This is a basic repo template for building new MapColonies web services in Typescript.
-
-### Template Features:
-
-- eslint configuration by [@map-colonies/eslint-config](https://github.com/MapColonies/eslint-config)
-
-- prettier configuration by [@map-colonies/prettier-config](https://github.com/MapColonies/prettier-config)
-
-- jest
-
-- .nvmrc
-
-- Multi stage producton-ready Dockerfile
-
-- commitlint
-
-- git hooks
-
-- logging by [@map-colonies/js-logger](https://github.com/MapColonies/js-logger)
-
-- OpenAPI request validation
-
-- config load with [node-config](https://www.npmjs.com/package/node-config)
-
-- Tracing and metrics by [@map-colonies/telemetry](https://github.com/MapColonies/telemetry)
-
-- github templates
-
-- bug report
-
-- feature request
-
-- pull request
-
-- github actions
-
-- on pull_request
-
-- LGTM
-
-- test
-
-- lint
-
-- snyk
-
-## API
-Checkout the OpenAPI spec [here](/openapi3.yaml)
-
-## Installation
-
-Install deps with npm
-
-```bash
-npm install
-```
-
-## Run Locally
-
-Clone the project
-
-```bash
-
-git clone https://link-to-project
-
-```
-
-Go to the project directory
-
-```bash
-
-cd my-project
-
-```
-
-Install dependencies
-
-```bash
-
-npm install
-
-```
-
-Start the server
-
-```bash
-
-npm run start
-
-```
-
-## Running Tests
-
-To run tests, run the following command
-
-```bash
-
-npm run test
-
-```
-
-To only run unit tests:
-```bash
-npm run test:unit
-```
-
-To only run integration tests:
-```bash
-npm run test:integration
-```
+**Server**
+* SERVER_PORT
+* REQUEST_PAYLOAD_LIMIT
+* RESPONSE_COMPRESSION_ENABLED

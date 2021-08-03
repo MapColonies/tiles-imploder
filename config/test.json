@@ -1,1 +1,36 @@
-{}
+{
+  "telemetry": {
+    "logger": {
+      "level": "info",
+      "prettyPrint": false
+    }
+  },
+  "server": {
+    "port": "8080",
+    "request": {
+      "payload": {
+        "limit": "1mb"
+      }
+    },
+    "response": {
+      "compression": {
+        "enabled": true,
+        "options": null
+      }
+    }
+  },
+  "tilesDirectoryPath": "/etc/tiles",
+  "geohash": {
+    "precision": 7
+  },
+  "gpkg": {
+    "name": "dme",
+    "path": "/etc",
+    "tableName": "dummy",
+    "resampling": "bilinear",
+    "tilingScheme": "InspireCRS84Quad"
+  },
+  "batch": {
+    "size": 15
+  }
+}

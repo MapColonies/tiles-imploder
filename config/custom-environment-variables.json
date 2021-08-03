@@ -1,7 +1,4 @@
 {
-  "openapiConfig": {
-    "filePath": "OPENAPI_FILE_PATH"
-  },
   "telemetry": {
     "serviceName": "TELEMETRY_SERVICE_NAME",
     "hostname": "TELEMETRY_HOST_NAME",
@@ -38,5 +35,23 @@
         }
       }
     }
+  },
+  "tilesDirectoryPath": "TILES_DIR_PATH",
+  "geohash": {
+    "precision": {
+      "__name": "GEOHASH_PRECISION",
+      "__format": "number"
+    }
+  },
+  "gpkg": {
+    "name": "GPKG_NAME",
+    "path": "GPKG_PATH",
+    "tableName": "GPKG_TABLE_NAME",
+    "resampling": "GPKG_RESAMPLING",
+    "tilingScheme": "GPKG_TILING_SCHEME"
+  },
+  "batch": {
+    "__name": "BATCH_SIZE",
+    "__format": "number"
   }
 }
