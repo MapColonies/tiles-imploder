@@ -21,23 +21,31 @@ export function getPixelResolution(zoomLevel: number): number {
   return tileRes / TILE_AXIS_SIZE;
 }
 
+export function degreesPerTile(zoomLevel: number): number {
+  const latRange = 180;
+  return latRange / (1 << zoomLevel);
+}
+
 export function snapBBoxToTileGrid(bbox: BBox2d, zoomLevel: number): BBox2d {
   const minLon = Math.min(bbox[0], bbox[2]);
   const minLat = Math.min(bbox[1], bbox[3]);
   const maxLon = Math.max(bbox[0], bbox[2]);
   const maxLat = Math.max(bbox[1], bbox[3]);
-
-  const tileRes = getTileResolution(zoomLevel);
-
-  bbox[0] = snapMinCord(minLon, tileRes);
-  bbox[1] = snapMinCord(minLat, tileRes);
-  bbox[2] = snapMinCord(maxLon, tileRes) + tileRes;
-  bbox[3] = snapMinCord(maxLat, tileRes) + tileRes;
-
+  const tileRes = degreesPerTile(zoomLevel);
+  bbox[0] = snapMinCordToTileGrid(minLon, tileRes);
+  bbox[1] = snapMinCordToTileGrid(minLat, tileRes);
+  bbox[2] = snapMinCordToTileGrid(maxLon, tileRes);
+  if (bbox[2] != maxLon) {
+    bbox[2] += tileRes;
+  }
+  bbox[3] = snapMinCordToTileGrid(maxLat, tileRes);
+  if (bbox[3] != maxLat) {
+    bbox[3] += tileRes;
+  }
   return bbox;
 }
 
-export function snapMinCord(cord: number, tileRes: number): number {
+export function snapMinCordToTileGrid(cord: number, tileRes: number): number {
   return cord - Math.abs(cord % tileRes);
 }
 

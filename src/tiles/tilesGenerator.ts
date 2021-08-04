@@ -40,8 +40,13 @@ export class TileGenerator {
     for (let x = minX; x <= maxX; x++) {
       for (let upperLeftY = minY; upperLeftY <= maxY; upperLeftY++) {
         const lowerLeftY = tilesInZoomLevel - upperLeftY;
-        const blob = await fsPromise.readFile(`${this.tilesDirectory}/${zoom}/${x}/${upperLeftY}.png`);
-        yield { z: zoom, x, y: lowerLeftY, tileData: blob };
+        const location = `${this.tilesDirectory}/${zoom}/${x}/${upperLeftY}.png`;
+        try {
+          const blob = await fsPromise.readFile(location);
+          yield { z: zoom, x, y: lowerLeftY, tileData: blob };
+        } catch (err) {
+          this.logger.info(`Could not find tile: ${location}`);
+        }
       }
     }
   }
