@@ -92,12 +92,15 @@ export class Worker {
     let pixelSize: number;
     const overviews: number[] = [];
 
+    // Overviews are built 1 zoom level before the maximum zoom level
+    let maxOverviewZoom = zoomLevel - 1;
+
     do {
-      pixelSize = getPixelResolution(zoomLevel);
+      pixelSize = getPixelResolution(maxOverviewZoom);
       overviews.push(overviewFactor);
       overviewFactor = overviewFactor << 1;
-      zoomLevel--;
-    } while (lonDiff / pixelSize >= 1 && latDiff / pixelSize >= 1);
+      maxOverviewZoom--;
+    } while (lonDiff >= pixelSize && latDiff >= pixelSize);
 
     overviews.pop();
     return overviews;
