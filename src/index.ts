@@ -28,7 +28,7 @@ server.listen(port, () => {
   logger.info(`app started on port ${port}`);
 });
 
-const handler = container.resolve(Handler);
+const handler = container.resolve<Handler>(Handler);
 const startHandleTasks = async (): Promise<void> => {
   const isRunning = true;
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
