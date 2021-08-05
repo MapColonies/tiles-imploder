@@ -17,10 +17,12 @@ export interface IInput {
   zoomLevel: number;
   tilesFullPath: string;
   packageName: string;
+  callbackURL: string;
+  expirationTime: Date;
 }
 
 export interface ITaskParameters {
-  url: string;
+  callbackURL: string;
   bbox: BBox2d | true;
   dbId: string;
   footprint: string;

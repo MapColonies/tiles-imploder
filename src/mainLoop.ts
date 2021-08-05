@@ -1,3 +1,5 @@
+import { promises as fsPromise } from 'fs';
+import axios from 'axios';
 import { Logger } from '@map-colonies/js-logger';
 import { BBox2d, Feature } from '@turf/helpers/dist/js/lib/geojson';
 import { IConfig } from 'config';
@@ -46,5 +48,21 @@ export class MainLoop {
 
     this.logger.info(`Building overviews in ${gpkgFullPath}`);
     await this.worker.buildOverviews(intersectionBbox, this.input.zoomLevel);
+
+    this.logger.info(`Making request to URL: ${this.input.callbackURL}`);
+    await this.makeCallbackRequest();
+  }
+
+  private async makeCallbackRequest(): Promise<void> {
+    const dbPath = this.db!.path;
+    const fileSize = await this.getFileSize(dbPath);
+    const data = { fileUri: dbPath, expirationTime: this.input.expirationTime, fileSize };
+    await axios.post('url', data);
+  }
+
+  private async getFileSize(path: string): Promise<number> {
+    const megaByteInBytes = 1048576; // 1024 * 1024
+    const fileSizeInBytes = (await fsPromise.stat(path)).size;
+    return fileSizeInBytes / megaByteInBytes;
   }
 }

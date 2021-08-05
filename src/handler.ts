@@ -52,6 +52,8 @@ export class Handler {
           zoomLevel: parameters.zoomLevel,
           tilesFullPath: join(this.tilesDirectoryPath, parameters.tilesPath),
           packageName: parameters.packageName,
+          callbackURL: parameters.callbackURL,
+          expirationTime: parameters.expirationTime,
         };
 
         const mainLoop = new MainLoop(input);
