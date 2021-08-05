@@ -5,7 +5,6 @@ import { MultiPolygon, Polygon } from '@turf/helpers/dist/js/lib/geojson';
 import { TaskHandler } from '@map-colonies/mc-priority-queue';
 import { IConfig, IInput, IQueueConfig, ITaskParameters } from './common/interfaces';
 import { MainLoop } from './mainLoop';
-import { hasMaxAttemps } from './common/utils';
 import { MaxAttemptsError } from './common/errors';
 import { Services } from './common/constants';
 
@@ -43,7 +42,7 @@ export class Handler {
       const parameters = data.parameters as ITaskParameters;
 
       try {
-        if (hasMaxAttemps(attempts)) {
+        if (attempts >= this.maxAttempts) {
           throw new MaxAttemptsError('reached max attempts');
         }
 

@@ -96,8 +96,3 @@ export function intersect(footprint: Geometry, bbox: BBox2d | true): Feature<Pol
   }
   return intersection;
 }
-
-export function hasMaxAttemps(attempts: number): boolean {
-  const maxAttempts = config.get<number>('maxAttempts');
-  return attempts >= maxAttempts;
-}
