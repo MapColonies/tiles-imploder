@@ -37,6 +37,18 @@
     }
   },
   "tilesDirectoryPath": "TILES_DIR_PATH",
+  "queue": {
+    "jobManagerBaseUrl": "QUEUE_JOB_MANAGER_BASE_URL",
+    "heartbeatManagerBaseUrl": "QUEUE_HEARTBEAT_MANAGER_BASE_URL",
+    "dequeueIntervalMs": "QUEUE_DEQUEUE_INTERVAL_MS",
+    "heartbeatIntervalMs": "QUEUE_HEARTBEAT_INTERVAL_MS",
+    "jobType": "QUEUE_JOB_TYPE",
+    "taskType": "QUEUE_TASK_TYPE"
+  },
+  "maxAttempts": {
+    "__name": "MAX_ATTEMPTS",
+    "__format": "number"
+  },
   "geohash": {
     "precision": {
       "__name": "GEOHASH_PRECISION",
@@ -44,9 +56,7 @@
     }
   },
   "gpkg": {
-    "name": "GPKG_NAME",
     "path": "GPKG_PATH",
-    "tableName": "GPKG_TABLE_NAME",
     "resampling": "GPKG_RESAMPLING",
     "tilingScheme": "GPKG_TILING_SCHEME"
   },

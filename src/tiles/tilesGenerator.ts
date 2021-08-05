@@ -16,7 +16,7 @@ export class TileGenerator {
   private readonly end: Tile;
   private readonly tilesDirectory: string;
 
-  public constructor(startTile: Tile, endTile: Tile) {
+  public constructor(startTile: Tile, endTile: Tile, tileDirectory: string) {
     this.start = startTile;
     this.end = endTile;
     this.tilesCount = -1;
@@ -24,7 +24,7 @@ export class TileGenerator {
     this.generator = this.generate();
     this.config = container.resolve(Services.CONFIG);
     this.logger = container.resolve(Services.LOGGER);
-    this.tilesDirectory = this.config.get<string>('tilesDirectoryPath');
+    this.tilesDirectory = tileDirectory;
   }
 
   private async *generate(): AsyncGenerator<Tile> {

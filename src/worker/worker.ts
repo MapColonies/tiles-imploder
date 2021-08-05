@@ -25,7 +25,7 @@ export class Worker {
     this.batchSize = this.config.get<number>('batch.size');
   }
 
-  public async populate(features: Feature[], maxZoomLevel: number): Promise<void> {
+  public async populate(features: Feature[], maxZoomLevel: number, tileDirectory: string): Promise<void> {
     for (const feat of features) {
       if (feat.bbox) {
         const firstCoordinate = { lon: feat.bbox[0], lat: feat.bbox[1] };
@@ -33,7 +33,7 @@ export class Worker {
 
         const startTile = Tile.fromULCoordinate(firstCoordinate, maxZoomLevel);
         const endTile = Tile.fromULCoordinate(secondCoordinate, maxZoomLevel);
-        const generator = new TileGenerator(startTile, endTile).generator;
+        const generator = new TileGenerator(startTile, endTile, tileDirectory).generator;
         await this.handleBatch(generator);
       } else {
         throw new Error(`Could not populate GPKG with feature ${JSON.stringify(feat)} - no BBOX supplied`);
@@ -43,14 +43,11 @@ export class Worker {
 
   public async buildOverviews(bbox: BBox2d, zoomLevel: number): Promise<void> {
     const promiseExec = promisify(exec);
-    const gpkgPath = this.config.get<string>('gpkg.path');
-    const gpkgName = this.config.get<string>('gpkg.name');
-    const gpkgFullPath = `${gpkgPath}/${gpkgName}.gpkg`;
 
     const resamplingMethod = this.config.get<string>('gpkg.resampling');
 
     const overviews = this.calculateOverviews(bbox, zoomLevel);
-    const command = `gdaladdo  -r ${resamplingMethod} ${gpkgFullPath} ${overviews.join(' ')}`;
+    const command = `gdaladdo  -r ${resamplingMethod} ${this.db.path} ${overviews.join(' ')}`;
 
     this.logger.info(`Building overviews with command: ${command}`);
     const { stdout, stderr } = await promiseExec(command);

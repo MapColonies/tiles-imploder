@@ -19,14 +19,21 @@
       }
     }
   },
-  "tilesDirectoryPath": "/etc/tiles",
+  "tilesDirectoryPath": "/path/to/tiles",
+  "queue": {
+    "jobManajerBaseUrl": "http://localhost:8082",
+    "heartbeatManagerBaseUrl": "http://localhost:8083",
+    "dequeueIntervalMs": 5000,
+    "heartbeatIntervalMs": 5000,
+    "jobType": "rasterTilesExporter",
+    "taskType": "rasterTilesExporter"
+  },
+  "maxAttempts": 3,
   "geohash": {
     "precision": 7
   },
   "gpkg": {
-    "name": "dme",
-    "path": "/etc",
-    "tableName": "dummy",
+    "path": "/path/to/gpkg",
     "resampling": "bilinear",
     "tilingScheme": "InspireCRS84Quad"
   },

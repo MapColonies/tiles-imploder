@@ -51,6 +51,7 @@ describe('worker', () => {
       runStatement: jest.fn(),
       insertTiles: jest.fn(),
     };
+    const tilesDirectory = '/mock';
 
     const tileFromCoordSpy = jest.spyOn(Tile, 'fromULCoordinate').mockReturnValueOnce(mockTile).mockReturnValueOnce(mockTile);
 
@@ -58,7 +59,7 @@ describe('worker', () => {
 
     const spyHandleBatch = jest.spyOn((worker as unknown) as { handleBatch: () => Promise<void> }, 'handleBatch');
 
-    await worker.populate(features, 15);
+    await worker.populate(features, 15, tilesDirectory);
 
     expect(spyHandleBatch).toHaveBeenCalled();
     expect(tileFromCoordSpy).toHaveBeenCalled();

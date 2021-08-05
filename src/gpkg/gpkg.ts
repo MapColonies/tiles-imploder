@@ -17,12 +17,14 @@ export class Gpkg {
   private readonly config: IConfig;
   private readonly extent: BBox2d;
   private readonly maxZoomLevel: number;
+  private readonly packageName: string;
   private gpkgConfig?: IGpkgConfig;
 
-  public constructor(path: string, extent: BBox2d, zoomLevel: number) {
+  public constructor(path: string, extent: BBox2d, zoomLevel: number, packageName: string) {
     this.path = path;
     this.extent = extent;
     this.maxZoomLevel = zoomLevel;
+    this.packageName = packageName;
     this.logger = container.resolve(Services.LOGGER);
     this.config = container.resolve(Services.CONFIG);
     this.create();
@@ -30,8 +32,7 @@ export class Gpkg {
   }
 
   public insertTiles(tiles: Tile[]): void {
-    const tableName = this.config.get<string>('gpkg.tableName');
-    const sql = `INSERT OR IGNORE INTO ${tableName} (tile_column, tile_row, zoom_level, tile_data) VALUES (@x, @y, @z, @tileData)`;
+    const sql = `INSERT OR IGNORE INTO ${this.packageName} (tile_column, tile_row, zoom_level, tile_data) VALUES (@x, @y, @z, @tileData)`;
     const statement = this.db.prepare(sql);
     this.db
       .transaction(() => {
@@ -61,13 +62,13 @@ export class Gpkg {
 
   private create(): void {
     this.gpkgConfig = this.config.get<IGpkgConfig>('gpkg');
-    const gpkgFullPath = `${this.gpkgConfig.path}/${this.gpkgConfig.name}.gpkg`;
+    const gpkgFullPath = `${this.gpkgConfig.path}/${this.packageName}.gpkg`;
     const [outsizeX, outsizeY] = gpkgSize(this.extent, this.maxZoomLevel);
 
     const command = `gdal_create -outsize ${outsizeX} ${outsizeY} -a_ullr ${this.extent[0]} ${this.extent[3]} ${this.extent[2]} ${this.extent[1]} \
     -co TILING_SCHEME=${this.gpkgConfig.tilingScheme} \
-    -co RASTER_TABLE=${this.gpkgConfig.tableName} \
-    -co RASTER_IDENTIFIER=${this.gpkgConfig.tableName} \
+    -co RASTER_TABLE=${this.packageName} \
+    -co RASTER_IDENTIFIER=${this.packageName} \
     -co ADD_GPKG_OGR_CONTENTS=NO ${gpkgFullPath}`;
 
     this.logger.info(`Creating a new GPKG with the command: ${command}`);

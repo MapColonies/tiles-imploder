@@ -15,12 +15,32 @@ export interface IInput {
   footprint: Polygon | MultiPolygon;
   bbox: BBox2d | true;
   zoomLevel: number;
+  tilesFullPath: string;
+  packageName: string;
+}
+
+export interface ITaskParameters {
+  url: string;
+  bbox: BBox2d | true;
+  dbId: string;
+  footprint: string;
+  tilesPath: string;
+  zoomLevel: number;
+  packageName: string;
+  expirationTime: Date;
 }
 
 export interface IGpkgConfig {
-  name: string;
   path: string;
-  tableName: string;
   resampling: string;
   tilingScheme: string;
+}
+
+export interface IQueueConfig {
+  jobManagerBaseUrl: string;
+  heartbeatManagerBaseUrl: string;
+  dequeueIntervalMs: number;
+  heartbeatIntervalMs: number;
+  jobType: string;
+  taskType: string;
 }
