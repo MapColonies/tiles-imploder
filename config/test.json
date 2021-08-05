@@ -24,9 +24,7 @@
     "precision": 7
   },
   "gpkg": {
-    "name": "dme",
     "path": "/etc",
-    "tableName": "dummy",
     "resampling": "bilinear",
     "tilingScheme": "InspireCRS84Quad"
   },

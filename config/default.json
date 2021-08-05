@@ -20,14 +20,20 @@
     }
   },
   "tilesDirectoryPath": "/home/shlomiko/Downloads",
+  "queue": {
+    "jobManagerBaseUrl": "http://localhost:8082",
+    "heartbeatManagerBaseUrl": "http://localhost:8083",
+    "dequeueIntervalMs": 5000,
+    "heartbeatIntervalMs": 5000,
+    "jobType": "rasterTilesExporter",
+    "taskType": "rasterTilesExporter"
+  },
   "maxAttempts": 3,
   "geohash": {
     "precision": 7
   },
   "gpkg": {
-    "name": "dme",
     "path": "/home/shlomiko/Desktop",
-    "tableName": "dummy",
     "resampling": "bilinear",
     "tilingScheme": "InspireCRS84Quad"
   },

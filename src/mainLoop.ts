@@ -28,24 +28,23 @@ export class MainLoop {
   }
 
   public async run(): Promise<void> {
-    const gpkgFullPath = `${this.gpkgConfig.path}/${this.gpkgConfig.name}.gpkg`;
+    const gpkgFullPath = `${this.gpkgConfig.path}/${this.input.packageName}.gpkg`;
 
     const intersection = intersect(this.input.footprint, this.input.bbox);
     const features: Feature[] = (await this.geohash.geojson2geohash(intersection)).map((geohash: string) => this.geohash.decode(geohash));
     const intersectionBbox: BBox2d = polygonToBBox(intersection) as BBox2d;
 
-    this.db = new Gpkg(gpkgFullPath, intersectionBbox, this.input.zoomLevel);
+    this.db = new Gpkg(gpkgFullPath, intersectionBbox, this.input.zoomLevel, this.input.packageName);
 
     this.logger.info(`Creating new GPKG`);
     this.worker = new Worker(this.db);
 
     this.logger.info(`Updating DB extents`);
     this.worker.updateExtent(intersectionBbox, this.input.zoomLevel);
-    throw new Error('RIK LO MSHANE SIEIE MASHEO');
     this.logger.info(`Populating ${gpkgFullPath} with bbox ${JSON.stringify(this.input.bbox)} until zoom level ${this.input.zoomLevel}`);
-    // await this.worker.populate(features, this.input.zoomLevel, this.input.tilesFullPath);
+    await this.worker.populate(features, this.input.zoomLevel, this.input.tilesFullPath);
 
     this.logger.info(`Building overviews in ${gpkgFullPath}`);
-    // await this.worker.buildOverviews(intersectionBbox, this.input.zoomLevel);
+    await this.worker.buildOverviews(intersectionBbox, this.input.zoomLevel);
   }
 }

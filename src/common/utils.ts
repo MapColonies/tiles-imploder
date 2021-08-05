@@ -3,11 +3,10 @@ import turfBBoxPolygon from '@turf/bbox-polygon';
 import turfLineStringToPolygon from '@turf/line-to-polygon';
 import { Geometry, Feature, Polygon, MultiPolygon, LineString, feature as turfFeature } from '@turf/helpers';
 import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
+import config from 'config';
 import { Tile } from '../tiles/tile';
 import { COORDINATE_SYSTEM, TILE_AXIS_SIZE } from './constants';
 import { Coordinate } from './interfaces';
-import { ITaskResponse } from '@map-colonies/mc-priority-queue';
-import config from 'config';
 
 let cacheZoomLevel: number;
 

@@ -43,14 +43,11 @@ export class Worker {
 
   public async buildOverviews(bbox: BBox2d, zoomLevel: number): Promise<void> {
     const promiseExec = promisify(exec);
-    const gpkgPath = this.config.get<string>('gpkg.path');
-    const gpkgName = this.config.get<string>('gpkg.name');
-    const gpkgFullPath = `${gpkgPath}/${gpkgName}.gpkg`;
 
     const resamplingMethod = this.config.get<string>('gpkg.resampling');
 
     const overviews = this.calculateOverviews(bbox, zoomLevel);
-    const command = `gdaladdo  -r ${resamplingMethod} ${gpkgFullPath} ${overviews.join(' ')}`;
+    const command = `gdaladdo  -r ${resamplingMethod} ${this.db.path} ${overviews.join(' ')}`;
 
     this.logger.info(`Building overviews with command: ${command}`);
     const { stdout, stderr } = await promiseExec(command);

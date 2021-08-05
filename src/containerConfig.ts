@@ -6,13 +6,16 @@ import jsLogger, { LoggerOptions } from '@map-colonies/js-logger';
 import { Metrics } from '@map-colonies/telemetry';
 import { Services } from './common/constants';
 import { tracing } from './common/tracing';
+import { IQueueConfig } from './common/interfaces';
 
 function registerExternalValues(): void {
   const loggerConfig = config.get<LoggerOptions>('telemetry.logger');
+  const queueConfig = config.get<IQueueConfig>('queue');
   // @ts-expect-error the signature is wrong
   const logger = jsLogger({ ...loggerConfig, prettyPrint: loggerConfig.prettyPrint, hooks: { logMethod } });
   container.register(Services.CONFIG, { useValue: config });
   container.register(Services.LOGGER, { useValue: logger });
+  container.register(Services.QUEUE_CONFIG, { useValue: queueConfig });
 
   tracing.start();
   const tracer = trace.getTracer('app');

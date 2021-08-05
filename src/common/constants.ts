@@ -10,6 +10,7 @@ export enum Services {
   CONFIG = 'IConfig',
   TRACER = 'TRACER',
   METER = 'METER',
+  QUEUE_CONFIG = 'IQueueConfig',
 }
 
 export const MIN_PIXEL_RESOLUTION = 0.703125;
