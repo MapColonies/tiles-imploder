@@ -1,21 +1,28 @@
-import { sep } from 'path';
-import config from 'config';
-import { container } from 'tsyringe';
+import { join } from 'path';
+import { inject, singleton } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import { MultiPolygon, Polygon } from '@turf/helpers/dist/js/lib/geojson';
 import { TaskHandler } from '@map-colonies/mc-priority-queue';
-import { IInput, IQueueConfig, ITaskParameters } from './common/interfaces';
+import { IConfig, IInput, IQueueConfig, ITaskParameters } from './common/interfaces';
 import { MainLoop } from './mainLoop';
 import { hasMaxAttemps } from './common/utils';
 import { MaxAttemptsError } from './common/errors';
 import { Services } from './common/constants';
 
+@singleton()
 export class Handler {
-  private readonly logger: Logger;
   private readonly taskHandler: TaskHandler;
-  private readonly queueConfig = container.resolve<IQueueConfig>(Services.QUEUE_CONFIG);
-  public constructor(logger: Logger) {
+  private readonly maxAttempts: number;
+  private readonly tilesDirectoryPath: string;
+
+  public constructor(
+    @inject(Services.LOGGER) private readonly logger: Logger,
+    @inject(Services.CONFIG) private readonly config: IConfig,
+    @inject(Services.QUEUE_CONFIG) private readonly queueConfig: IQueueConfig
+  ) {
     this.logger = logger;
+    this.maxAttempts = config.get<number>('maxAttempts');
+    this.tilesDirectoryPath = config.get<string>('tilesDirectoryPath');
     this.taskHandler = new TaskHandler(
       logger,
       this.queueConfig.jobType,
@@ -34,7 +41,6 @@ export class Handler {
       const jobId = data.jobId;
       const taskId = data.id;
       const parameters = data.parameters as ITaskParameters;
-      const tilesDirectoryPath = config.get<string>('tilesDirectoryPath');
 
       try {
         if (hasMaxAttemps(attempts)) {
@@ -45,13 +51,13 @@ export class Handler {
           footprint: JSON.parse(parameters.footprint) as Polygon | MultiPolygon,
           bbox: parameters.bbox,
           zoomLevel: parameters.zoomLevel,
-          tilesFullPath: tilesDirectoryPath + sep + parameters.tilesPath,
+          tilesFullPath: join(this.tilesDirectoryPath, parameters.tilesPath),
           packageName: parameters.packageName,
         };
 
         const mainLoop = new MainLoop(input);
         await mainLoop.run();
-        this.logger.info(`Succesfully populated GPKG with tiles`);
+        this.logger.info(`Succesfully populated GPKG for jobId=${jobId}, taskId=${taskId} with tiles`);
         void this.taskHandler.ack(data.jobId, data.id);
       } catch (error) {
         if (error instanceof MaxAttemptsError) {

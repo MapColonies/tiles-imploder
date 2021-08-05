@@ -19,7 +19,7 @@
       }
     }
   },
-  "tilesDirectoryPath": "/path/to/tiles",
+  "tilesDirectoryPath": "/home/shlomiko/Downloads",
   "queue": {
     "jobManagerBaseUrl": "http://localhost:8082",
     "heartbeatManagerBaseUrl": "http://localhost:8083",
@@ -33,7 +33,7 @@
     "precision": 7
   },
   "gpkg": {
-    "path": "/path/to/gpkg",
+    "path": "/home/shlomiko/Desktop",
     "resampling": "bilinear",
     "tilingScheme": "InspireCRS84Quad"
   },
