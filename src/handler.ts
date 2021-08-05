@@ -63,7 +63,7 @@ export class Handler {
           await this.taskHandler.reject(jobId, taskId, false);
         } else {
           await this.taskHandler.reject(jobId, taskId, true, (error as Error).message);
-          this.logger.error(`Error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
+          this.logger.error(`Error: jobId=${jobId}, taskId=${taskId}, ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
         }
       }
     }
