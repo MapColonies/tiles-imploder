@@ -46,3 +46,18 @@ export interface IQueueConfig {
   jobType: string;
   taskType: string;
 }
+
+export interface IJobData {
+  dbId: string;
+  targetResolution: number;
+  crs: string;
+  callbackURL: string;
+  bbox: BBox2d;
+  priority: number;
+  packageName: string;
+  footprint: Polygon | MultiPolygon;
+
+  version: string;
+  cswProductId: string;
+  tilesPath: string;
+}
