@@ -12,6 +12,7 @@ export interface Coordinate {
 }
 
 export interface IInput {
+  jobId: string;
   footprint: Polygon | MultiPolygon;
   bbox: BBox2d | true;
   zoomLevel: number;

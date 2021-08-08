@@ -48,6 +48,7 @@ export class TaskManager {
         }
 
         const input: IInput = {
+          jobId,
           footprint: JSON.parse(parameters.footprint) as Polygon | MultiPolygon,
           bbox: parameters.bbox,
           zoomLevel: parameters.zoomLevel,

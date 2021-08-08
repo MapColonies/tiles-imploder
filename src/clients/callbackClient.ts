@@ -2,7 +2,7 @@ import { inject, singleton } from 'tsyringe';
 import { HttpClient, IHttpRetryConfig } from '@map-colonies/mc-utils';
 import { Logger } from '@map-colonies/js-logger';
 import { Services } from '../common/constants';
-import { IConfig } from '../common/interfaces';
+import { IConfig, IInput } from '../common/interfaces';
 
 @singleton()
 export class CallbackClient extends HttpClient {
@@ -10,8 +10,24 @@ export class CallbackClient extends HttpClient {
     super(logger, '', 'requestCallback', config.get<IHttpRetryConfig>('httpRetry'));
   }
 
-  public async sendCallback(url: string, dbPath: string, expirationTime: Date, fileSize: number): Promise<void> {
-    const data = { fileUri: dbPath, expirationTime, fileSize };
+  public async sendCallback(
+    url: string,
+    dbPath: string,
+    expirationTime: Date,
+    fileSize: number,
+    input: IInput,
+    targetResolution: number
+  ): Promise<void> {
+    const data = {
+      fileUri: dbPath,
+      expirationTime,
+      fileSize,
+      targetResolution,
+      dbId: input.jobId,
+      packageName: input.packageName,
+      bbox: input.bbox,
+      callbackURL: input.callbackURL,
+    };
     try {
       await this.post(url, data);
     } catch {

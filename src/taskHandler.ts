@@ -11,6 +11,7 @@ import { Gpkg } from './gpkg/gpkg';
 import { Worker } from './worker/worker';
 import { intersect } from './common/utils';
 import { CallbackClient } from './clients/callbackClient';
+import { JobsClient } from './clients/jobsClient';
 
 @singleton()
 export class TaskHandler {
@@ -20,7 +21,8 @@ export class TaskHandler {
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
     @inject(Services.CONFIG) private readonly config: IConfig,
-    private readonly callbackClient: CallbackClient
+    private readonly callbackClient: CallbackClient,
+    private readonly jobClient: JobsClient
   ) {
     this.geohash = new GeoHash();
     this.gpkgConfig = this.config.get<IGpkgConfig>('gpkg');
@@ -46,10 +48,14 @@ export class TaskHandler {
     this.logger.info(`Building overviews in ${gpkgFullPath}`);
     await worker.buildOverviews(intersectionBbox, input.zoomLevel);
 
+    this.logger.info(`Get Job Params for: ${input.jobId}`);
+    const jobData = await this.jobClient.getJob(input.jobId);
+    const targetResolution = jobData?.targetResolution;
+
     this.logger.info(`Making request to URL: ${input.callbackURL}`);
     const dbPath = db.path;
     const fileSize = await this.getFileSizeInMB(dbPath);
-    await this.callbackClient.sendCallback(input.callbackURL, dbPath, input.expirationTime, fileSize);
+    await this.callbackClient.sendCallback(input.callbackURL, dbPath, input.expirationTime, fileSize, input, targetResolution);
   }
 
   private async getFileSizeInMB(path: string): Promise<number> {

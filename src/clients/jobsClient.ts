@@ -1,20 +1,21 @@
 import { inject, singleton } from 'tsyringe';
-import { HttpClient, IHttpRetryConfig } from '@map-colonies/mc-utils';
 import { Logger } from '@map-colonies/js-logger';
+import { JobManagerClient } from '@map-colonies/mc-priority-queue';
 import { Services } from '../common/constants';
-import { IConfig, IJobData } from '../common/interfaces';
+import { IJobData, IQueueConfig } from '../common/interfaces';
 
 @singleton()
-export class CallbackClient extends HttpClient {
-  public constructor(@inject(Services.LOGGER) logger: Logger, @inject(Services.CONFIG) private readonly config: IConfig) {
-    super(logger, config.get('queue.jobManagerBaseUrl'), 'JobsManager', config.get<IHttpRetryConfig>('httpRetry'));
+export class JobsClient extends JobManagerClient {
+  public constructor(@inject(Services.LOGGER) logger: Logger, @inject(Services.QUEUE_CONFIG) private readonly queueConfig: IQueueConfig) {
+    super(logger, queueConfig.jobType, queueConfig.taskType, queueConfig.jobManagerBaseUrl);
   }
 
-  public async getJob(jobId: string): Promise<IJobData> {
+  public async getJob(jobId: string): Promise<IJobData | undefined> {
     try {
       return await this.get<IJobData>(`/jobs/${jobId}`);
     } catch {
       this.logger.error(`failed to get job data for callback for job: ${jobId}`);
+      return undefined;
     }
   }
 }
