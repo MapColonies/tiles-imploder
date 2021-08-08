@@ -27,6 +27,7 @@ export class CallbackClient extends HttpClient {
       packageName: input.packageName,
       bbox: input.bbox,
       callbackURL: input.callbackURL,
+      וrequetId: input.jobId,
     };
     try {
       await this.post(url, data);
