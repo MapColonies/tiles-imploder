@@ -39,5 +39,10 @@
   },
   "batch": {
     "size": 15
+  },
+  "httpRetry": {
+    "attempts": 5,
+    "delay": "exponential",
+    "shouldResetTimeout": true
   }
 }
