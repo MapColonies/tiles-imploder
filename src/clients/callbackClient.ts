@@ -16,7 +16,7 @@ export class CallbackClient extends HttpClient {
     expirationTime: Date,
     fileSize: number,
     input: IInput,
-    targetResolution: number
+    targetResolution: number | undefined
   ): Promise<void> {
     const data = {
       fileUri: dbPath,
@@ -27,7 +27,7 @@ export class CallbackClient extends HttpClient {
       packageName: input.packageName,
       bbox: input.bbox,
       callbackURL: input.callbackURL,
-      וrequetId: input.jobId,
+      requetId: input.jobId,
     };
     try {
       await this.post(url, data);
