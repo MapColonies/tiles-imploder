@@ -42,28 +42,30 @@ export class TaskManager {
       const taskId = data.id;
       const parameters = data.parameters as ITaskParameters;
 
+      const input: IInput = {
+        jobId,
+        footprint: JSON.parse(parameters.footprint) as Polygon | MultiPolygon,
+        bbox: parameters.bbox,
+        zoomLevel: parameters.zoomLevel,
+        tilesFullPath: join(this.tilesDirectoryPath, parameters.tilesPath),
+        packageName: parameters.packageName,
+        callbackURL: parameters.callbackURL,
+        expirationTime: parameters.expirationTime,
+      };
+
       try {
         if (attempts >= this.maxAttempts) {
           throw new MaxAttemptsError('reached max attempts');
         }
 
-        const input: IInput = {
-          jobId,
-          footprint: JSON.parse(parameters.footprint) as Polygon | MultiPolygon,
-          bbox: parameters.bbox,
-          zoomLevel: parameters.zoomLevel,
-          tilesFullPath: join(this.tilesDirectoryPath, parameters.tilesPath),
-          packageName: parameters.packageName,
-          callbackURL: parameters.callbackURL,
-          expirationTime: parameters.expirationTime,
-        };
-
         await this.taskHandler.run(input);
         this.logger.info(`Succesfully populated GPKG for jobId=${jobId}, taskId=${taskId} with tiles`);
+        await this.taskHandler.sendCallback(input);
         void this.queueHandler.ack(data.jobId, data.id);
       } catch (error) {
         if (error instanceof MaxAttemptsError) {
           await this.queueHandler.reject(jobId, taskId, false);
+          await this.taskHandler.sendCallback(input, error?.message);
         } else {
           await this.queueHandler.reject(jobId, taskId, true, (error as Error).message);
           this.logger.error(`Error: jobId=${jobId}, taskId=${taskId}, ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);

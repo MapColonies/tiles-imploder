@@ -29,7 +29,7 @@ export class TaskHandler {
   }
 
   public async run(input: IInput): Promise<void> {
-    const gpkgFullPath = `${this.gpkgConfig.path}/${input.packageName}.gpkg`;
+    const gpkgFullPath = this.getGPKGPath90(input.packageName);
 
     const intersection = intersect(input.footprint, input.bbox);
     const features: Feature[] = (await this.geohash.geojson2geohash(intersection)).map((geohash: string) => this.geohash.decode(geohash));
@@ -47,20 +47,35 @@ export class TaskHandler {
 
     this.logger.info(`Building overviews in ${gpkgFullPath}`);
     await worker.buildOverviews(intersectionBbox, input.zoomLevel);
+  }
 
-    this.logger.info(`Get Job Params for: ${input.jobId}`);
-    const jobData = await this.jobClient.getJob(input.jobId);
-    const targetResolution = jobData?.targetResolution;
+  public async sendCallback(input: IInput, errorReason?: string): Promise<void> {
+    try {
+      const gpkgFullPath = this.getGPKGPath90(input.packageName);
 
-    this.logger.info(`Making request to URL: ${input.callbackURL}`);
-    const dbPath = db.path;
-    const fileSize = await this.getFileSizeInMB(dbPath);
-    await this.callbackClient.sendCallback(input.callbackURL, dbPath, input.expirationTime, fileSize, input, targetResolution);
+      this.logger.info(`Get Job Params for: ${input.jobId}`);
+      const jobData = await this.jobClient.getJob(input.jobId);
+      const targetResolution = jobData?.targetResolution;
+      const success = errorReason != undefined;
+      let fileSize = 0;
+      if (success) {
+        fileSize = await this.getFileSizeInMB(gpkgFullPath);
+      }
+      this.logger.info(`Making request to URL: ${input.callbackURL}`);
+      await this.callbackClient.sendCallback(input.callbackURL, gpkgFullPath, input.expirationTime, fileSize, input, success, targetResolution, errorReason);
+    } catch (error) {
+      this.logger.error(`failed to send callback to ${input.callbackURL}, error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
+    }
   }
 
   private async getFileSizeInMB(path: string): Promise<number> {
     const megaByteInBytes = 1048576; // 1024 * 1024
     const fileSizeInBytes = (await fsPromise.stat(path)).size;
     return fileSizeInBytes / megaByteInBytes;
+  }
+
+  private getGPKGPath90(packageName: string): string {
+    const gpkgFullPath = `${this.gpkgConfig.path}/${packageName}.gpkg`;
+    return gpkgFullPath;
   }
 }
