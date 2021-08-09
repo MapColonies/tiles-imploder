@@ -60,7 +60,7 @@
     "resampling": "GPKG_RESAMPLING",
     "tilingScheme": "GPKG_TILING_SCHEME"
   },
-  "batch": {
+  "batchSize": {
     "__name": "BATCH_SIZE",
     "__format": "number"
   },
