@@ -51,21 +51,18 @@ export class TaskManager {
         packageName: parameters.packageName,
         callbackURL: parameters.callbackURL,
         expirationTime: parameters.expirationTime,
+        dbId: parameters.dbId,
       };
 
       try {
-        if (attempts >= this.maxAttempts) {
-          throw new MaxAttemptsError('reached max attempts');
-        }
-
         await this.taskHandler.run(input);
         this.logger.info(`Succesfully populated GPKG for jobId=${jobId}, taskId=${taskId} with tiles`);
         await this.taskHandler.sendCallback(input);
         void this.queueHandler.ack(data.jobId, data.id);
       } catch (error) {
-        if (error instanceof MaxAttemptsError) {
+        if (attempts >= this.maxAttempts) {
           await this.queueHandler.reject(jobId, taskId, false);
-          await this.taskHandler.sendCallback(input, error.message);
+          await this.taskHandler.sendCallback(input, (error as Error).message);
         } else {
           await this.queueHandler.reject(jobId, taskId, true, (error as Error).message);
           this.logger.error(`Error: jobId=${jobId}, taskId=${taskId}, ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);

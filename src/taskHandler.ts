@@ -56,7 +56,7 @@ export class TaskHandler {
       this.logger.info(`Get Job Params for: ${input.jobId}`);
       const jobData = await this.jobClient.getJob(input.jobId);
       const targetResolution = jobData?.targetResolution;
-      const success = errorReason != undefined;
+      const success = errorReason === undefined;
       let fileSize = 0;
       if (success) {
         fileSize = await this.getFileSizeInMB(gpkgFullPath);

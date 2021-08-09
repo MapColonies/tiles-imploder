@@ -21,7 +21,7 @@
   },
   "tilesDirectoryPath": "/path/to/tiles",
   "queue": {
-    "jobManajerBaseUrl": "http://localhost:8082",
+    "jobManagerBaseUrl": "http://localhost:8082",
     "heartbeatManagerBaseUrl": "http://localhost:8083",
     "dequeueIntervalMs": 5000,
     "heartbeatIntervalMs": 5000,

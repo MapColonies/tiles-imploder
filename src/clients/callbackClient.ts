@@ -25,7 +25,7 @@ export class CallbackClient extends HttpClient {
       expirationTime,
       fileSize,
       targetResolution,
-      dbId: input.jobId,
+      dbId: input.dbId,
       packageName: input.packageName,
       bbox: input.bbox,
       callbackURL: input.callbackURL,

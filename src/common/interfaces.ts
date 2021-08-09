@@ -20,6 +20,7 @@ export interface IInput {
   packageName: string;
   callbackURL: string;
   expirationTime: Date;
+  dbId: string;
 }
 
 export interface ITaskParameters {
