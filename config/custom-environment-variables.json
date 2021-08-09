@@ -37,6 +37,7 @@
     }
   },
   "tilesDirectoryPath": "TILES_DIR_PATH",
+  "downloadServerUrl": "DOWNLOAD_SERVER_URL",
   "queue": {
     "jobManagerBaseUrl": "QUEUE_JOB_MANAGER_BASE_URL",
     "heartbeatManagerBaseUrl": "QUEUE_HEARTBEAT_MANAGER_BASE_URL",

@@ -20,6 +20,7 @@
     }
   },
   "tilesDirectoryPath": "/path/to/tiles",
+  "downloadServerUrl": "http://localhost:8084/downloads",
   "queue": {
     "jobManagerBaseUrl": "http://localhost:8082",
     "heartbeatManagerBaseUrl": "http://localhost:8083",
