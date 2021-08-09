@@ -27,7 +27,7 @@ export class TaskHandler {
   ) {
     this.geohash = new GeoHash();
     this.gpkgConfig = this.config.get<IGpkgConfig>('gpkg');
-    this.downloadServerUrl = this.config.get<string>('tilesDirectoryPath');
+    this.downloadServerUrl = this.config.get<string>('downloadServerUrl');
   }
 
   public async run(input: IInput): Promise<void> {
