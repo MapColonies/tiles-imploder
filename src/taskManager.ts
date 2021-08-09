@@ -65,7 +65,7 @@ export class TaskManager {
       } catch (error) {
         if (error instanceof MaxAttemptsError) {
           await this.queueHandler.reject(jobId, taskId, false);
-          await this.taskHandler.sendCallback(input, error?.message);
+          await this.taskHandler.sendCallback(input, error.message);
         } else {
           await this.queueHandler.reject(jobId, taskId, true, (error as Error).message);
           this.logger.error(`Error: jobId=${jobId}, taskId=${taskId}, ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);

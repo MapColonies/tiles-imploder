@@ -37,10 +37,10 @@ export class TaskHandler {
 
     const db = new Gpkg(gpkgFullPath, intersectionBbox, input.zoomLevel, input.packageName);
 
-    this.logger.info(`Creating new GPKG`);
+    this.logger.info(`Creating new GPKG ${JSON.stringify(input)}`);
     const worker = new Worker(db);
 
-    this.logger.info(`Updating DB extents`);
+    this.logger.info(`Updating DB extents ${JSON.stringify(input)}`);
     worker.updateExtent(intersectionBbox, input.zoomLevel);
     this.logger.info(`Populating ${gpkgFullPath} with bbox ${JSON.stringify(input.bbox)} until zoom level ${input.zoomLevel}`);
     await worker.populate(features, input.zoomLevel, input.tilesFullPath);
@@ -62,7 +62,16 @@ export class TaskHandler {
         fileSize = await this.getFileSizeInMB(gpkgFullPath);
       }
       this.logger.info(`Making request to URL: ${input.callbackURL}`);
-      await this.callbackClient.sendCallback(input.callbackURL, gpkgFullPath, input.expirationTime, fileSize, input, success, targetResolution, errorReason);
+      await this.callbackClient.sendCallback(
+        input.callbackURL,
+        gpkgFullPath,
+        input.expirationTime,
+        fileSize,
+        input,
+        success,
+        targetResolution,
+        errorReason
+      );
     } catch (error) {
       this.logger.error(`failed to send callback to ${input.callbackURL}, error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
     }
