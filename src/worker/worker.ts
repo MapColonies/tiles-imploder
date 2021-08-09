@@ -22,7 +22,7 @@ export class Worker {
     this.logger = container.resolve(Services.LOGGER);
     this.config = container.resolve(Services.CONFIG);
     this.db = db;
-    this.batchSize = this.config.get<number>('batch.size');
+    this.batchSize = this.config.get<number>('batch_size');
   }
 
   public async populate(features: Feature[], maxZoomLevel: number, tileDirectory: string): Promise<void> {
