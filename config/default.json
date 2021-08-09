@@ -37,7 +37,5 @@
     "resampling": "bilinear",
     "tilingScheme": "InspireCRS84Quad"
   },
-  "batch": {
-    "size": 15
-  }
+  "batchSize": 15
 }
