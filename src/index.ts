@@ -9,7 +9,7 @@ import { Logger } from '@map-colonies/js-logger';
 import { container } from 'tsyringe';
 import { DEFAULT_SERVER_PORT, Services } from './common/constants';
 import { getApp } from './app';
-import { Handler } from './handler';
+import { TaskManager } from './taskManager';
 
 interface IServerConfig {
   port: string;
@@ -28,13 +28,13 @@ server.listen(port, () => {
   logger.info(`app started on port ${port}`);
 });
 
-const handler = container.resolve<Handler>(Handler);
-const startHandleTasks = async (): Promise<void> => {
+const manager = container.resolve<TaskManager>(TaskManager);
+const mainLoop = async (): Promise<void> => {
   const isRunning = true;
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   while (isRunning) {
-    await handler.handleTask();
+    await manager.work();
   }
 };
 
-void startHandleTasks();
+void mainLoop();

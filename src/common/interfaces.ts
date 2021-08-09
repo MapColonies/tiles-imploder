@@ -12,15 +12,19 @@ export interface Coordinate {
 }
 
 export interface IInput {
+  jobId: string;
   footprint: Polygon | MultiPolygon;
   bbox: BBox2d | true;
   zoomLevel: number;
   tilesFullPath: string;
   packageName: string;
+  callbackURL: string;
+  expirationTime: Date;
+  dbId: string;
 }
 
 export interface ITaskParameters {
-  url: string;
+  callbackURL: string;
   bbox: BBox2d | true;
   dbId: string;
   footprint: string;
@@ -43,4 +47,19 @@ export interface IQueueConfig {
   heartbeatIntervalMs: number;
   jobType: string;
   taskType: string;
+}
+
+export interface IJobData {
+  dbId: string;
+  targetResolution: number;
+  crs: string;
+  callbackURL: string;
+  bbox: BBox2d;
+  priority: number;
+  packageName: string;
+  footprint: Polygon | MultiPolygon;
+
+  version: string;
+  cswProductId: string;
+  tilesPath: string;
 }
