@@ -5,7 +5,6 @@ import { MultiPolygon, Polygon } from '@turf/helpers/dist/js/lib/geojson';
 import { TaskHandler as QueueHandler } from '@map-colonies/mc-priority-queue';
 import { IConfig, IInput, IQueueConfig, ITaskParameters } from './common/interfaces';
 import { TaskHandler } from './taskHandler';
-import { MaxAttemptsError } from './common/errors';
 import { Services } from './common/constants';
 
 @singleton()
