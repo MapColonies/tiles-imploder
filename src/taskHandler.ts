@@ -17,6 +17,7 @@ import { JobsClient } from './clients/jobsClient';
 export class TaskHandler {
   private readonly geohash: GeoHash;
   private readonly gpkgConfig: IGpkgConfig;
+  private readonly downloadServerUrl: string;
 
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
@@ -26,6 +27,7 @@ export class TaskHandler {
   ) {
     this.geohash = new GeoHash();
     this.gpkgConfig = this.config.get<IGpkgConfig>('gpkg');
+    this.downloadServerUrl = this.config.get<string>('tilesDirectoryPath');
   }
 
   public async run(input: IInput): Promise<void> {
@@ -61,9 +63,12 @@ export class TaskHandler {
       if (success) {
         fileSize = await this.getFileSizeInMB(gpkgFullPath);
       }
+
+      const downloadUrl = `${this.downloadServerUrl}/${input.packageName}.gpkg`;
+
       await this.callbackClient.sendCallback(
         input.callbackURL,
-        gpkgFullPath,
+        downloadUrl,
         input.expirationTime,
         fileSize,
         input,
