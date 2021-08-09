@@ -61,7 +61,6 @@ export class TaskHandler {
       if (success) {
         fileSize = await this.getFileSizeInMB(gpkgFullPath);
       }
-      this.logger.info(`Making request to URL: ${input.callbackURL}`);
       await this.callbackClient.sendCallback(
         input.callbackURL,
         gpkgFullPath,
