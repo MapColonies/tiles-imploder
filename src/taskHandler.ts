@@ -58,7 +58,7 @@ export class TaskHandler {
       this.logger.info(`Get Job Params for: ${input.jobId}`);
       const jobData = await this.queueClient.queueHandler.jobManagerClient.getJob(input.jobId);
       const jobParameters = jobData?.parameters as IJobData;
-      const targetResolution = jobParameters?.targetResolution;
+      const targetResolution = jobParameters.targetResolution;
       const success = errorReason === undefined;
       let fileSize = 0;
       if (success) {
