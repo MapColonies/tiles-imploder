@@ -58,7 +58,6 @@ export interface IJobData {
   priority: number;
   packageName: string;
   footprint: Polygon | MultiPolygon;
-
   version: string;
   cswProductId: string;
   tilesPath: string;
