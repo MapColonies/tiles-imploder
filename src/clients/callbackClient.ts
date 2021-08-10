@@ -36,8 +36,8 @@ export class CallbackClient extends HttpClient {
     try {
       this.logger.info(`send Callback request to URL: ${input.callbackURL} with data ${JSON.stringify(data)}`);
       await this.post(url, data);
-    } catch {
-      this.logger.error(`failed to send callback to ${input.callbackURL}`);
+    } catch (error) {
+      this.logger.error(`failed to send callback to ${input.callbackURL}, error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
     }
   }
 }
