@@ -89,12 +89,13 @@ export class Worker {
     const overviews: number[] = [];
 
     // Overviews are built 1 zoom level before the maximum zoom level
-    let maxOverviewZoom = zoomLevel - 1;
+    const maxOverviewZoom = zoomLevel - 1;
     let pixelSize = getPixelResolution(maxOverviewZoom);
 
     while (lonDiff >= pixelSize && latDiff >= pixelSize) {
       overviews.push(overviewFactor);
       overviewFactor = overviewFactor << 1;
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
       pixelSize = pixelSize * 2;
     }
 
