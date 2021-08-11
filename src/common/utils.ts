@@ -7,13 +7,8 @@ import { Tile } from '../tiles/tile';
 import { COORDINATE_SYSTEM, TILE_AXIS_SIZE } from './constants';
 import { Coordinate } from './interfaces';
 
-let cacheZoomLevel: number;
-
 export function getTileResolution(zoomLevel: number): number {
-  if (cacheZoomLevel !== zoomLevel) {
-    cacheZoomLevel = COORDINATE_SYSTEM.maxLon / (1 << zoomLevel);
-  }
-  return cacheZoomLevel;
+  return COORDINATE_SYSTEM.maxLon / (1 << zoomLevel);
 }
 
 export function getPixelResolution(zoomLevel: number): number {
@@ -27,22 +22,23 @@ export function degreesPerTile(zoomLevel: number): number {
 }
 
 export function snapBBoxToTileGrid(bbox: BBox2d, zoomLevel: number): BBox2d {
+  const tileGridBBox: number[] = [];
   const minLon = Math.min(bbox[0], bbox[2]);
   const minLat = Math.min(bbox[1], bbox[3]);
   const maxLon = Math.max(bbox[0], bbox[2]);
   const maxLat = Math.max(bbox[1], bbox[3]);
   const tileRes = degreesPerTile(zoomLevel);
-  bbox[0] = snapMinCordToTileGrid(minLon, tileRes);
-  bbox[1] = snapMinCordToTileGrid(minLat, tileRes);
-  bbox[2] = snapMinCordToTileGrid(maxLon, tileRes);
-  if (bbox[2] != maxLon) {
-    bbox[2] += tileRes;
+  tileGridBBox[0] = snapMinCordToTileGrid(minLon, tileRes);
+  tileGridBBox[1] = snapMinCordToTileGrid(minLat, tileRes);
+  tileGridBBox[2] = snapMinCordToTileGrid(maxLon, tileRes);
+  if (tileGridBBox[2] != maxLon) {
+    tileGridBBox[2] += tileRes;
   }
-  bbox[3] = snapMinCordToTileGrid(maxLat, tileRes);
-  if (bbox[3] != maxLat) {
-    bbox[3] += tileRes;
+  tileGridBBox[3] = snapMinCordToTileGrid(maxLat, tileRes);
+  if (tileGridBBox[3] != maxLat) {
+    tileGridBBox[3] += tileRes;
   }
-  return bbox;
+  return tileGridBBox as BBox2d;
 }
 
 export function snapMinCordToTileGrid(cord: number, tileRes: number): number {

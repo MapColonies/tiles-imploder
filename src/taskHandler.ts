@@ -5,7 +5,7 @@ import { IConfig } from 'config';
 import { inject, singleton } from 'tsyringe';
 import polygonToBBox from '@turf/bbox';
 import { Services } from './common/constants';
-import { IGpkgConfig, IInput } from './common/interfaces';
+import { ICallbackResponse, IGpkgConfig, IInput } from './common/interfaces';
 import { GeoHash } from './geohash/geohash';
 import { Gpkg } from './gpkg/gpkg';
 import { Worker } from './worker/worker';
@@ -31,7 +31,7 @@ export class TaskHandler {
   }
 
   public async run(input: IInput): Promise<void> {
-    const gpkgFullPath = this.getGPKGPath90(input.packageName);
+    const gpkgFullPath = this.getGPKGPath(input.packageName);
 
     const intersection = intersect(input.footprint, input.bbox);
     const features: Feature[] = (await this.geohash.geojson2geohash(intersection)).map((geohash: string) => this.geohash.decode(geohash));
@@ -53,41 +53,42 @@ export class TaskHandler {
 
   public async sendCallback(input: IInput, errorReason?: string): Promise<void> {
     try {
-      const gpkgFullPath = this.getGPKGPath90(input.packageName);
-
+      const gpkgFullPath = this.getGPKGPath(input.packageName);
       this.logger.info(`Get Job Params for: ${input.jobId}`);
       const jobData = await this.jobClient.getJob(input.jobId);
       const targetResolution = jobData?.targetResolution;
       const success = errorReason === undefined;
       let fileSize = 0;
       if (success) {
-        fileSize = await this.getFileSizeInMB(gpkgFullPath);
+        fileSize = await this.getFileSize(gpkgFullPath);
       }
 
-      const downloadUrl = `${this.downloadServerUrl}/${input.packageName}.gpkg`;
-
-      await this.callbackClient.sendCallback(
-        input.callbackURL,
-        downloadUrl,
-        input.expirationTime,
+      const fileUri = `${this.downloadServerUrl}/${input.packageName}.gpkg`;
+      const callbackParams: ICallbackResponse = {
+        fileUri,
+        expirationTime: input.expirationTime,
         fileSize,
-        input,
-        success,
+        dbId: input.dbId,
+        packageName: input.packageName,
+        bbox: input.bbox,
         targetResolution,
-        errorReason
-      );
+        requestId: input.jobId,
+        success,
+        errorReason,
+      };
+
+      await this.callbackClient.send(input.callbackURL, callbackParams);
     } catch (error) {
-      this.logger.error(`failed to send callback to ${input.callbackURL}, error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
+      this.logger.error(`Failed to send callback to ${input.callbackURL}, error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
     }
   }
 
-  private async getFileSizeInMB(path: string): Promise<number> {
-    const megaByteInBytes = 1048576; // 1024 * 1024
+  private async getFileSize(path: string): Promise<number> {
     const fileSizeInBytes = (await fsPromise.stat(path)).size;
-    return fileSizeInBytes / megaByteInBytes;
+    return fileSizeInBytes;
   }
 
-  private getGPKGPath90(packageName: string): string {
+  private getGPKGPath(packageName: string): string {
     const gpkgFullPath = `${this.gpkgConfig.path}/${packageName}.gpkg`;
     return gpkgFullPath;
   }

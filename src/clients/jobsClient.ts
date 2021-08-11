@@ -10,12 +10,12 @@ export class JobsClient extends JobManagerClient {
     super(logger, queueConfig.jobType, queueConfig.taskType, queueConfig.jobManagerBaseUrl);
   }
 
-  public async getJob(jobId: string): Promise<IJobData | undefined> {
+  public async getJob(jobId: string): Promise<IJobData> {
     try {
       return await this.get<IJobData>(`/jobs/${jobId}`);
-    } catch {
-      this.logger.error(`failed to get job data for callback for job: ${jobId}`);
-      return undefined;
+    } catch (error) {
+      this.logger.error(`Failed to get job data for callback for job: ${jobId}`);
+      throw error;
     }
   }
 }
