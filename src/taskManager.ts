@@ -5,10 +5,8 @@ import { MultiPolygon, Polygon } from '@turf/helpers/dist/js/lib/geojson';
 import { IUpdateJobRequestPayload, TaskStatus } from '@map-colonies/mc-priority-queue';
 import { IConfig, IInput, IQueueConfig, ITaskParameters } from './common/interfaces';
 import { TaskHandler } from './taskHandler';
-import { Services } from './common/constants';
+import { FULL_PRECENTAGE, Services } from './common/constants';
 import { QueueClient } from './clients/queueClient';
-
-const fullPrecentage = 100;
 
 @singleton()
 export class TaskManager {
@@ -71,7 +69,7 @@ export class TaskManager {
     this.logger.info(`Update Job status to success=${String(isSuccess)} jobId=${jobId}`);
     const joUpdatePayload: IUpdateJobRequestPayload = {
       status: isSuccess ? TaskStatus.COMPLETED : TaskStatus.FAILED,
-      percentage: isSuccess ? fullPrecentage : undefined,
+      percentage: isSuccess ? FULL_PRECENTAGE : undefined,
       reason: errorReason,
     };
     await this.queueClient.queueHandler.jobManagerClient.updateJob(jobId, joUpdatePayload);

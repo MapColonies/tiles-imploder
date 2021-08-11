@@ -21,3 +21,4 @@ export const COORDINATE_SYSTEM = {
   maxLon: 180,
   minLon: -180,
 };
+export const FULL_PRECENTAGE = 100;
