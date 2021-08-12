@@ -55,8 +55,7 @@ export class TaskHandler {
     try {
       const gpkgFullPath = this.getGPKGPath(input.packageName);
       this.logger.info(`Get Job Params for: ${input.jobId}`);
-      const jobData = await this.jobClient.getJob(input.jobId);
-      const targetResolution = jobData.targetResolution;
+      const targetResolution = (await this.jobClient.getJob(input.jobId)).parameters.targetResolution;
       const success = errorReason === undefined;
       let fileSize = 0;
       if (success) {
@@ -85,7 +84,7 @@ export class TaskHandler {
 
   private async getFileSize(path: string): Promise<number> {
     const fileSizeInBytes = (await fsPromise.stat(path)).size;
-    return fileSizeInBytes;
+    return Math.trunc(fileSizeInBytes); // Make sure we return an Integer
   }
 
   private getGPKGPath(packageName: string): string {

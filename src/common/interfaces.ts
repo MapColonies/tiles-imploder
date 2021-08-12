@@ -63,6 +63,10 @@ export interface IJobData {
   tilesPath: string;
 }
 
+export interface IJobResponse {
+  parameters: IJobData;
+}
+
 export interface ICallbackResponse {
   fileUri: string;
   expirationTime: Date;
