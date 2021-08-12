@@ -2,7 +2,7 @@ import { inject, singleton } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import { JobManagerClient } from '@map-colonies/mc-priority-queue';
 import { Services } from '../common/constants';
-import { IJobData, IQueueConfig } from '../common/interfaces';
+import { IJobResponse, IQueueConfig } from '../common/interfaces';
 
 @singleton()
 export class JobsClient extends JobManagerClient {
@@ -10,12 +10,12 @@ export class JobsClient extends JobManagerClient {
     super(logger, queueConfig.jobType, queueConfig.taskType, queueConfig.jobManagerBaseUrl);
   }
 
-  public async getJob(jobId: string): Promise<IJobData | undefined> {
+  public async getJob(jobId: string): Promise<IJobResponse> {
     try {
-      return await this.get<IJobData>(`/jobs/${jobId}`);
-    } catch {
-      this.logger.error(`failed to get job data for callback for job: ${jobId}`);
-      return undefined;
+      return await this.get<IJobResponse>(`/jobs/${jobId}`);
+    } catch (error) {
+      this.logger.error(`Failed to get job data for callback for job: ${jobId}`);
+      throw error;
     }
   }
 }

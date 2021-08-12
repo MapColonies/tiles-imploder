@@ -6,7 +6,7 @@ import { IConfig } from 'config';
 import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import { Services } from '../common/constants';
 import { IGpkgConfig } from '../common/interfaces';
-import { gpkgSize } from '../common/utils';
+import { gpkgSize, snapBBoxToTileGrid } from '../common/utils';
 import { Tile } from '../tiles/tile';
 
 @injectable()
@@ -63,9 +63,10 @@ export class Gpkg {
   private create(): void {
     this.gpkgConfig = this.config.get<IGpkgConfig>('gpkg');
     const gpkgFullPath = `${this.gpkgConfig.path}/${this.packageName}.gpkg`;
+    const tileGridBBox = snapBBoxToTileGrid(this.extent, this.maxZoomLevel);
     const [outsizeX, outsizeY] = gpkgSize(this.extent, this.maxZoomLevel);
 
-    const command = `gdal_create -outsize ${outsizeX} ${outsizeY} -a_ullr ${this.extent[0]} ${this.extent[3]} ${this.extent[2]} ${this.extent[1]} \
+    const command = `gdal_create -outsize ${outsizeX} ${outsizeY} -a_ullr ${tileGridBBox[0]} ${tileGridBBox[3]} ${tileGridBBox[2]} ${tileGridBBox[1]} \
     -co TILING_SCHEME=${this.gpkgConfig.tilingScheme} \
     -co RASTER_TABLE=${this.packageName} \
     -co RASTER_IDENTIFIER=${this.packageName} \

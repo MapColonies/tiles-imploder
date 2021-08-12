@@ -58,8 +58,24 @@ export interface IJobData {
   priority: number;
   packageName: string;
   footprint: Polygon | MultiPolygon;
-
   version: string;
   cswProductId: string;
   tilesPath: string;
+}
+
+export interface IJobResponse {
+  parameters: IJobData;
+}
+
+export interface ICallbackResponse {
+  fileUri: string;
+  expirationTime: Date;
+  fileSize: number;
+  dbId: string;
+  packageName: string;
+  bbox: BBox2d | true;
+  targetResolution: number;
+  requestId: string;
+  success: boolean;
+  errorReason?: string;
 }
