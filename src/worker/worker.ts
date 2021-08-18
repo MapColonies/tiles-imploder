@@ -86,20 +86,19 @@ export class Worker {
     const latDiff = bbox[3] - bbox[1];
 
     let overviewFactor = 2;
-    let pixelSize: number;
     const overviews: number[] = [];
 
     // Overviews are built 1 zoom level before the maximum zoom level
-    let maxOverviewZoom = zoomLevel - 1;
+    const maxOverviewZoom = zoomLevel - 1;
+    let pixelSize = getPixelResolution(maxOverviewZoom);
 
-    do {
-      pixelSize = getPixelResolution(maxOverviewZoom);
+    while (lonDiff >= pixelSize && latDiff >= pixelSize) {
       overviews.push(overviewFactor);
       overviewFactor = overviewFactor << 1;
-      maxOverviewZoom--;
-    } while (lonDiff >= pixelSize && latDiff >= pixelSize);
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+      pixelSize = pixelSize * 2;
+    }
 
-    overviews.pop();
     return overviews;
   }
 }
