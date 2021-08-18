@@ -5,13 +5,13 @@ import { IConfig } from 'config';
 import { inject, singleton } from 'tsyringe';
 import polygonToBBox from '@turf/bbox';
 import { Services } from './common/constants';
-import { ICallbackResponse, IGpkgConfig, IInput } from './common/interfaces';
+import { ICallbackResponse, IGpkgConfig, IInput, IJobData } from './common/interfaces';
 import { GeoHash } from './geohash/geohash';
 import { Gpkg } from './gpkg/gpkg';
 import { Worker } from './worker/worker';
 import { intersect } from './common/utils';
 import { CallbackClient } from './clients/callbackClient';
-import { JobsClient } from './clients/jobsClient';
+import { QueueClient } from './clients/queueClient';
 
 @singleton()
 export class TaskHandler {
@@ -23,7 +23,7 @@ export class TaskHandler {
     @inject(Services.LOGGER) private readonly logger: Logger,
     @inject(Services.CONFIG) private readonly config: IConfig,
     private readonly callbackClient: CallbackClient,
-    private readonly jobClient: JobsClient
+    private readonly queueClient: QueueClient
   ) {
     this.geohash = new GeoHash();
     this.gpkgConfig = this.config.get<IGpkgConfig>('gpkg');
@@ -55,7 +55,8 @@ export class TaskHandler {
     try {
       const gpkgFullPath = this.getGPKGPath(input.packageName);
       this.logger.info(`Get Job Params for: ${input.jobId}`);
-      const targetResolution = (await this.jobClient.getJob(input.jobId)).parameters.targetResolution;
+      const jobData = await this.queueClient.queueHandler.jobManagerClient.getJob(input.jobId);
+      const targetResolution = (jobData?.parameters as IJobData).targetResolution;
       const success = errorReason === undefined;
       let fileSize = 0;
       if (success) {
