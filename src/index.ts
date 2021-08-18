@@ -33,7 +33,11 @@ const mainLoop = async (): Promise<void> => {
   const isRunning = true;
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   while (isRunning) {
-    await manager.work();
+    try {
+      await manager.work();
+    } catch (error) {
+      logger.error(`mainLoop: Error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
+    }
   }
 };
 
