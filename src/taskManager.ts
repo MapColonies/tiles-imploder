@@ -2,7 +2,7 @@ import { join } from 'path';
 import { inject, singleton } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import { MultiPolygon, Polygon } from '@turf/helpers/dist/js/lib/geojson';
-import { IUpdateJobRequestPayload, TaskStatus } from '@map-colonies/mc-priority-queue';
+import { IUpdateJobBody, OperationStatus } from '@map-colonies/mc-priority-queue';
 import { IConfig, IInput, IQueueConfig, ITaskParameters } from './common/interfaces';
 import { TaskHandler } from './taskHandler';
 import { FULL_PRECENTAGE, Services } from './common/constants';
@@ -67,8 +67,8 @@ export class TaskManager {
 
   public async finishJob(jobId: string, isSuccess = true, errorReason: string | undefined = undefined): Promise<void> {
     this.logger.info(`Update Job status to success=${String(isSuccess)} jobId=${jobId}`);
-    const joUpdatePayload: IUpdateJobRequestPayload = {
-      status: isSuccess ? TaskStatus.COMPLETED : TaskStatus.FAILED,
+    const joUpdatePayload: IUpdateJobBody = {
+      status: isSuccess ? OperationStatus.COMPLETED : OperationStatus.FAILED,
       percentage: isSuccess ? FULL_PRECENTAGE : undefined,
       reason: errorReason,
     };
