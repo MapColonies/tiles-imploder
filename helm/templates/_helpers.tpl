@@ -71,6 +71,19 @@ Returns the cloud provider name from global if exists or from the chart's values
 {{- end -}}
 
 {{/*
+Returns the cloud provider image pull secret name from global if exists or from the chart's values
+*/}}
+{{- define "tiles-imploder.cloudProviderImagePullSecretName" -}}
+{{- if .Values.global.cloudProvider.imagePullSecretName }}
+    {{- .Values.global.cloudProvider.imagePullSecretName -}}
+{{- else if .Values.cloudProvider -}}
+    {{- .Values.cloudProvider.imagePullSecretName -}}
+{{- else -}}
+    {{ "minikube" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Returns the cloud provider docker registry url from global if exists or from the chart's values
 */}}
 {{- define "tiles-imploder.cloudProviderDockerRegistryUrl" -}}
