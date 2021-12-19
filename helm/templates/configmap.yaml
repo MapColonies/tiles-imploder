@@ -33,10 +33,6 @@ data:
   GPKG_RESAMPLING: {{ .Values.env.gpkg.resampling }}
   GPKG_TILING_SCHEME: {{ .Values.env.gpkg.tilingScheme }}
   BATCH_SIZE: {{ .Values.env.batchSize }}
-  DEQUEUE_INTERVAL_MS: {{ .Values.env.queue.dequeueIntervalMs }}
-  HEARTBEAT_INTERVAL_MS: {{ .Values.env.queue.heartbeatIntervalMs }}
-  TASK_TYPE: {{ .Values.env.queue.taskType }}
-  JOB_TYPE: {{ .Values.env.queue.jobType }}
   HTTP_RETRY_ATTEMPTS: {{ .Values.env.httpRetry.attempts }}
   HTTP_RETRY_DELAY: {{ .Values.env.httpRetry.delay }}
   HTTP_RETRY_RESET_TIMEOUT: {{ .Values.env.httpRetry.shouldResetTimeout }}
