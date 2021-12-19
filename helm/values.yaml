@@ -12,11 +12,26 @@ nodePort: 30030 #for minikube deployment only
 
 cloudProvider:
   dockerRegistryUrl: my-registry-url.io
+  imagePullSecretName: pullSecretName
   flavor: openshift
 
+storage:
+  accessModes: ReadWriteOnce
+  storageSize: 5Gi
+  storageClass: azure-file
+  pv:
+    enabled: false
+    hostPath: /raster/gpkgs
+  internalPvc:
+    enabled: false
+    name: internal-pvc
+  gpkgsPvc:
+    enabled: false
+    name: gpkgs-storage
+
 image:
-  repository: ts-server-boilerplate
-  tag: 'latest'
+  repository: tiles-imploder
+  tag: v1.2.0
 
 env:
   port: 8080
@@ -32,7 +47,7 @@ env:
   metrics:
     enabled: false
     url: http://localhost:55681/v1/metrics
-  tilesDirectoryPath: "/path/to/tiles"
+  tilesDirectoryPath: "/tilesStorage"
   downloadServerUrl: "http://localhost:8084/downloads"
   queue: 
     jobManagerBaseUrl: "http://localhost:8082"
@@ -45,7 +60,7 @@ env:
   geohash: 
     precision: 7
   gpkg:
-    path: "/path/to/gpkg"
+    path: "/gpkgStorage"
     resampling: "bilinear"
     tilingScheme: "InspireCRS84Quad"
   batchSize: 15
@@ -54,9 +69,8 @@ env:
     delay: "exponential"
     shouldResetTimeout: true
   
-
 resources:
-  enabled: false
+  enabled: true
   value:
     limits:
       cpu: 100m

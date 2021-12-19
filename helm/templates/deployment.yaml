@@ -1,7 +1,7 @@
 {{- $releaseName := .Release.Name -}}
-{{- $chartName := include "ts-server-boilerplate.name" . -}}
-{{- $cloudProviderFlavor := include "ts-server-boilerplate.cloudProviderFlavor" . -}}
-{{- $cloudProviderDockerRegistryUrl := include "ts-server-boilerplate.cloudProviderDockerRegistryUrl" . -}}
+{{- $chartName := include "tiles-imploder.name" . -}}
+{{- $cloudProviderFlavor := include "tiles-imploder.cloudProviderFlavor" . -}}
+{{- $cloudProviderDockerRegistryUrl := include "tiles-imploder.cloudProviderDockerRegistryUrl" . -}}
 {{- if .Values.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -10,9 +10,9 @@ metadata:
   labels:
     app: {{ $chartName }}
     component: {{ $chartName }}
-    environment: {{ include "ts-server-boilerplate.environment" . }}
+    environment: {{ include "tiles-imploder.environment" . }}
     release: {{ $releaseName }}
-    {{- include "ts-server-boilerplate.labels" . | nindent 4 }}
+    {{- include "tiles-imploder.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -20,15 +20,23 @@ spec:
       app: {{ $chartName }}
       release: {{ $releaseName }}
       run: {{ $releaseName }}-{{ $chartName }}
-      {{- include "ts-server-boilerplate.selectorLabels" . | nindent 6 }}
+      {{- include "tiles-imploder.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         app: {{ $chartName }}
         release: {{ $releaseName }}
         run: {{ $releaseName }}-{{ $chartName }}
-        {{- include "ts-server-boilerplate.selectorLabels" . | nindent 8 }}
+        {{- include "tiles-imploder.selectorLabels" . | nindent 8 }}
     spec:
+    {{- if .Values.cloudProvider.imagePullSecretName }}
+      imagePullSecrets:
+        - name: {{ .Values.cloudProvider.imagePullSecretName | quote }}
+    {{- end }}
+      volumes:
+      - name: internal-storage
+        persistentVolumeClaim:
+          claimName: {{ .Values.storage.internalPvc.name }} 
       containers:
         - name: {{ $releaseName }}-{{ $chartName }}-deployment
           {{- with .Values.image }}
@@ -53,6 +61,13 @@ spec:
             httpGet:
               path: /liveness
               port: http
+          volumeMounts:
+            - name: internal-storage
+              mountPath: {{ .Values.env.tilesDirectoryPath }}
+              subPath: tiles 
+            - name: internal-storage 
+              mountPath: {{ .Values.env.gpkg.path }} 
+              subPath: gpkgs
           {{- if .Values.resources.enabled }}
           resources:
             {{- toYaml .Values.resources.value | nindent 12 }}

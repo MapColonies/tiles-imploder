@@ -1,6 +1,6 @@
-{{- $chartName := include "ts-server-boilerplate.name" . -}}
-{{- $tracingUrl := include "ts-server-boilerplate.tracingUrl" . -}}
-{{- $metricsUrl := include "ts-server-boilerplate.metricsUrl" . -}}
+{{- $chartName := include "tiles-imploder.name" . -}}
+{{- $tracingUrl := include "tiles-imploder.tracingUrl" . -}}
+{{- $metricsUrl := include "tiles-imploder.metricsUrl" . -}}
 {{- if .Values.enabled -}}
 apiVersion: v1
 kind: ConfigMap
@@ -19,20 +19,20 @@ data:
   TELEMETRY_METRICS_ENABLED: 'true'
   TELEMETRY_METRICS_URL: {{ $metricsUrl }}
   {{ end }}
-  TILES_DIR_PATH: {{ .Values.env.tilesDirectoryPath }}
-  QUEUE_JOB_MANAGER_BASE_URL: {{ .Values.env.queue.jobManagerBaseUrl }}
-  QUEUE_HEARTBEAT_MANAGER_BASE_URL: {{ .Values.env.queue.heartbeatManagerBaseUrl }}
-  QUEUE_HEARTBEAT_INTERVAL_MS: {{ .Values.env.queue.heartbeatIntervalMs }}
-  QUEUE_JOB_TYPE: {{ .Values.env.queue.jobType }}
-  QUEUE_TASK_TYPE: {{ .Values.env.queue.taskType }}
-  DOWNLOAD_SERVER_URL: {{ .Values.env.downloadServerUrl }}
-  MAX_ATTEMPTS: {{ .Values.env.maxAttempts }}
-  GEOHASH_PRECISION: {{ .Values.env.geohash.precision }}
-  GPKG_PATH: {{ .Values.env.gpkg.path }}
-  GPKG_RESAMPLING: {{ .Values.env.gpkg.resampling }}
-  GPKG_TILING_SCHEME: {{ .Values.env.gpkg.tilingScheme }}
-  BATCH_SIZE: {{ .Values.env.batchSize }}
-  HTTP_RETRY_ATTEMPTS: {{ .Values.env.httpRetry.attempts }}
-  HTTP_RETRY_DELAY: {{ .Values.env.httpRetry.delay }}
-  HTTP_RETRY_RESET_TIMEOUT: {{ .Values.env.httpRetry.shouldResetTimeout }}
+  TILES_DIR_PATH: {{ .Values.env.tilesDirectoryPath | quote }}
+  QUEUE_JOB_MANAGER_BASE_URL: {{ .Values.env.queue.jobManagerBaseUrl | quote }}
+  QUEUE_HEARTBEAT_MANAGER_BASE_URL: {{ .Values.env.queue.heartbeatManagerBaseUrl | quote }}
+  QUEUE_HEARTBEAT_INTERVAL_MS: {{ .Values.env.queue.heartbeatIntervalMs | quote }}
+  QUEUE_JOB_TYPE: {{ .Values.env.queue.jobType | quote }}
+  QUEUE_TASK_TYPE: {{ .Values.env.queue.taskType | quote }}
+  DOWNLOAD_SERVER_URL: {{ .Values.env.downloadServerUrl | quote }}
+  MAX_ATTEMPTS: {{ .Values.env.maxAttempts | quote }}
+  GEOHASH_PRECISION: {{ .Values.env.geohash.precision | quote}}
+  GPKG_PATH: {{ .Values.env.gpkg.path | quote }}
+  GPKG_RESAMPLING: {{ .Values.env.gpkg.resampling | quote }}
+  GPKG_TILING_SCHEME: {{ .Values.env.gpkg.tilingScheme | quote }}
+  BATCH_SIZE: {{ .Values.env.batchSize | quote }}
+  HTTP_RETRY_ATTEMPTS: {{ .Values.env.httpRetry.attempts | quote }}
+  HTTP_RETRY_DELAY: {{ .Values.env.httpRetry.delay | quote }}
+  HTTP_RETRY_RESET_TIMEOUT: {{ .Values.env.httpRetry.shouldResetTimeout | quote }}
 {{- end }}
