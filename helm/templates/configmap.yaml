@@ -20,4 +20,24 @@ data:
   TELEMETRY_METRICS_URL: {{ $metricsUrl }}
   {{ end }}
   LOG_LEVEL: {{ .Values.env.logLevel | quote }}
+  TILES_DIR_PATH: {{ .Values.env.tilesDirectoryPath }}
+  QUEUE_JOB_MANAGER_BASE_URL: {{ .Values.env.queue.jobManagerBaseUrl }}
+  QUEUE_HEARTBEAT_MANAGER_BASE_URL: {{ .Values.env.queue.heartbeatManagerBaseUrl }}
+  QUEUE_HEARTBEAT_INTERVAL_MS: {{ .Values.env.queue.heartbeatIntervalMs }}
+  QUEUE_JOB_TYPE: {{ .Values.env.queue.jobType }}
+  QUEUE_TASK_TYPE: {{ .Values.env.queue.taskType }}
+  DOWNLOAD_SERVER_URL: {{ .Values.env.downloadServerUrl }}
+  MAX_ATTEMPTS: {{ .Values.env.maxAttempts }}
+  GEOHASH_PRECISION: {{ .Values.env.geohash.precision }}
+  GPKG_PATH: {{ .Values.env.gpkg.path }}
+  GPKG_RESAMPLING: {{ .Values.env.gpkg.resampling }}
+  GPKG_TILING_SCHEME: {{ .Values.env.gpkg.tilingScheme }}
+  BATCH_SIZE: {{ .Values.env.batchSize }}
+  DEQUEUE_INTERVAL_MS: {{ .Values.env.queue.dequeueIntervalMs }}
+  HEARTBEAT_INTERVAL_MS: {{ .Values.env.queue.heartbeatIntervalMs }}
+  TASK_TYPE: {{ .Values.env.queue.taskType }}
+  JOB_TYPE: {{ .Values.env.queue.jobType }}
+  HTTP_RETRY_ATTEMPTS: {{ .Values.env.httpRetry.attempts }}
+  HTTP_RETRY_DELAY: {{ .Values.env.httpRetry.delay }}
+  HTTP_RETRY_RESET_TIMEOUT: {{ .Values.env.httpRetry.shouldResetTimeout }}
 {{- end }}
