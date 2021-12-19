@@ -19,7 +19,6 @@ data:
   TELEMETRY_METRICS_ENABLED: 'true'
   TELEMETRY_METRICS_URL: {{ $metricsUrl }}
   {{ end }}
-  LOG_LEVEL: {{ .Values.env.logLevel | quote }}
   TILES_DIR_PATH: {{ .Values.env.tilesDirectoryPath }}
   QUEUE_JOB_MANAGER_BASE_URL: {{ .Values.env.queue.jobManagerBaseUrl }}
   QUEUE_HEARTBEAT_MANAGER_BASE_URL: {{ .Values.env.queue.heartbeatManagerBaseUrl }}
