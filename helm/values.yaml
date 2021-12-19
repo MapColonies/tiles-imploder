@@ -37,8 +37,8 @@ env:
   queue: 
     jobManagerBaseUrl: "http://localhost:8082"
     heartbeatManagerBaseUrl: "http://localhost:8083"
-    dequeueIntervalMs: 5000
-    heartbeatIntervalMs: 5000
+    dequeueIntervalMs: 1000
+    heartbeatIntervalMs: 300
     jobType: "rasterTilesExporter"
     taskType: "rasterTilesExporter"
   maxAttempts: 3
