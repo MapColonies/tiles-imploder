@@ -27,7 +27,7 @@ export interface ITaskParameters {
   callbackURL: string;
   bbox: BBox2d | true;
   dbId: string;
-  footprint: string;
+  footprint: Polygon | MultiPolygon;
   tilesPath: string;
   zoomLevel: number;
   packageName: string;

@@ -1,7 +1,6 @@
 import { join } from 'path';
 import { inject, singleton } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
-import { MultiPolygon, Polygon } from '@turf/helpers/dist/js/lib/geojson';
 import { IUpdateJobBody, OperationStatus } from '@map-colonies/mc-priority-queue';
 import { IConfig, IInput, IQueueConfig, ITaskParameters } from './common/interfaces';
 import { TaskHandler } from './taskHandler';
@@ -35,7 +34,7 @@ export class TaskManager {
 
       const input: IInput = {
         jobId,
-        footprint: JSON.parse(parameters.footprint) as Polygon | MultiPolygon,
+        footprint: parameters.footprint,
         bbox: parameters.bbox,
         zoomLevel: parameters.zoomLevel,
         tilesFullPath: join(this.tilesDirectoryPath, parameters.tilesPath),
