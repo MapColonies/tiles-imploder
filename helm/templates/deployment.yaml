@@ -2,6 +2,8 @@
 {{- $chartName := include "tiles-imploder.name" . -}}
 {{- $cloudProviderFlavor := include "tiles-imploder.cloudProviderFlavor" . -}}
 {{- $cloudProviderDockerRegistryUrl := include "tiles-imploder.cloudProviderDockerRegistryUrl" . -}}
+{{- $cloudProviderImagePullSecretName := include "tiles-imploder.cloudProviderImagePullSecretName" . -}}
+
 {{- if .Values.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -29,9 +31,9 @@ spec:
         run: {{ $releaseName }}-{{ $chartName }}
         {{- include "tiles-imploder.selectorLabels" . | nindent 8 }}
     spec:
-    {{- if .Values.cloudProvider.imagePullSecretName }}
+    {{- if $cloudProviderImagePullSecretName }}
       imagePullSecrets:
-        - name: {{ .Values.cloudProvider.imagePullSecretName | quote }}
+        - name: {{ $cloudProviderImagePullSecretName | quote }}
     {{- end }}
       volumes:
       - name: internal-storage
