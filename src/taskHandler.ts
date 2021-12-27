@@ -11,8 +11,6 @@ import { Gpkg } from './gpkg/gpkg';
 import { Worker } from './worker/worker';
 import { intersect } from './common/utils';
 import { CallbackClient } from './clients/callbackClient';
-import { QueueClient } from './clients/queueClient';
-import { JobManagerClient } from './clients/jobManagerClient';
 
 @singleton()
 export class TaskHandler {
@@ -23,9 +21,7 @@ export class TaskHandler {
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
     @inject(Services.CONFIG) private readonly config: IConfig,
-    private readonly callbackClient: CallbackClient,
-    private readonly queueClient: QueueClient,
-    private readonly jobManagerClient: JobManagerClient
+    private readonly callbackClient: CallbackClient
   ) {
     this.geohash = new GeoHash();
     this.gpkgConfig = this.config.get<IGpkgConfig>('gpkg');
@@ -90,7 +86,9 @@ export class TaskHandler {
       await Promise.all(callbackPromises);
       return callbackParams;
     } catch (error) {
-      this.logger.error(`Failed to send callback to ${input.callbackURL}, error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
+      this.logger.error(
+        `Failed to send callback to ${input.callbackURL.toString()}, error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`
+      );
     }
   }
 

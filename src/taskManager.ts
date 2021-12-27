@@ -38,7 +38,7 @@ export class TaskManager {
         footprint: parameters.footprint,
         bbox: parameters.bbox,
         zoomLevel: parameters.zoomLevel,
-        tilesPath: join(this.tilesDirectoryPath, parameters.tilesPath, parameters.productType),
+        tilesPath: join(this.tilesDirectoryPath, parameters.tilesPath),
         packageName: parameters.packageName,
         callbackURL: parameters.callbackURL,
         dbId: parameters.dbId,
@@ -81,7 +81,7 @@ export class TaskManager {
       reason,
       percentage: isSuccess ? FULL_PRECENTAGE : undefined,
       expirationDate,
-      parameters: { originalParams: jobData.parameters, callbackParams },
+      parameters: { ...jobData.parameters, callbackParams },
     };
 
     this.logger.info(`Update Job status to success=${String(isSuccess)} jobId=${input.jobId}`);
