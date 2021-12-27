@@ -5,13 +5,14 @@ import { IConfig } from 'config';
 import { inject, singleton } from 'tsyringe';
 import polygonToBBox from '@turf/bbox';
 import { Services } from './common/constants';
-import { ICallbackResponse, IGpkgConfig, IInput, IJobData } from './common/interfaces';
+import { ICallbackResponse, IGpkgConfig, IInput } from './common/interfaces/interfaces';
 import { GeoHash } from './geohash/geohash';
 import { Gpkg } from './gpkg/gpkg';
 import { Worker } from './worker/worker';
 import { intersect } from './common/utils';
 import { CallbackClient } from './clients/callbackClient';
 import { QueueClient } from './clients/queueClient';
+import { JobManagerClient } from './clients/jobManagerClient';
 
 @singleton()
 export class TaskHandler {
@@ -23,7 +24,8 @@ export class TaskHandler {
     @inject(Services.LOGGER) private readonly logger: Logger,
     @inject(Services.CONFIG) private readonly config: IConfig,
     private readonly callbackClient: CallbackClient,
-    private readonly queueClient: QueueClient
+    private readonly queueClient: QueueClient,
+    private readonly jobManagerClient: JobManagerClient
   ) {
     this.geohash = new GeoHash();
     this.gpkgConfig = this.config.get<IGpkgConfig>('gpkg');
@@ -45,18 +47,21 @@ export class TaskHandler {
     this.logger.info(`Updating DB extents ${JSON.stringify(input)}`);
     worker.updateExtent(intersectionBbox, input.zoomLevel);
     this.logger.info(`Populating ${gpkgFullPath} with bbox ${JSON.stringify(input.bbox)} until zoom level ${input.zoomLevel}`);
-    await worker.populate(features, input.zoomLevel, input.tilesFullPath);
+    await worker.populate(features, input.zoomLevel, input.tilesPath);
 
     this.logger.info(`Building overviews in ${gpkgFullPath}`);
     await worker.buildOverviews(intersectionBbox, input.zoomLevel);
   }
 
-  public async sendCallback(input: IInput, errorReason?: string): Promise<void> {
+  public async sendCallback(
+    input: IInput,
+    targetResolution: number,
+    expirationDate: Date,
+    callbackURLs: string[],
+    errorReason?: string
+  ): Promise<ICallbackResponse | undefined> {
     try {
       const gpkgFullPath = this.getGPKGPath(input.packageName);
-      this.logger.info(`Get Job Params for: ${input.jobId}`);
-      const jobData = await this.queueClient.queueHandler.jobManagerClient.getJob(input.jobId);
-      const targetResolution = (jobData?.parameters as IJobData).targetResolution;
       const success = errorReason === undefined;
       let fileSize = 0;
       if (success) {
@@ -66,7 +71,7 @@ export class TaskHandler {
       const fileUri = `${this.downloadServerUrl}/${input.packageName}.gpkg`;
       const callbackParams: ICallbackResponse = {
         fileUri,
-        expirationTime: input.expirationTime,
+        expirationTime: expirationDate,
         fileSize,
         dbId: input.dbId,
         packageName: input.packageName,
@@ -77,7 +82,13 @@ export class TaskHandler {
         errorReason,
       };
 
-      await this.callbackClient.send(input.callbackURL, callbackParams);
+      const callbackPromises: Promise<void>[] = [];
+      for (const url of callbackURLs) {
+        callbackPromises.push(this.callbackClient.send(url, callbackParams));
+      }
+
+      await Promise.all(callbackPromises);
+      return callbackParams;
     } catch (error) {
       this.logger.error(`Failed to send callback to ${input.callbackURL}, error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
     }

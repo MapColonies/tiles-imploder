@@ -35,7 +35,7 @@ describe('worker', () => {
       insertTiles: jest.fn(),
     };
 
-    const worker = new Worker((gpkg as unknown) as Gpkg);
+    const worker = new Worker(gpkg as unknown as Gpkg);
     const spy = jest.spyOn(Utils, 'snapBBoxToTileGrid');
 
     const mockBBox: BBox2d = [0, 0, 1, 1];
@@ -55,9 +55,9 @@ describe('worker', () => {
 
     const tileFromCoordSpy = jest.spyOn(Tile, 'fromULCoordinate').mockReturnValueOnce(mockTile).mockReturnValueOnce(mockTile);
 
-    const worker = new Worker((gpkg as unknown) as Gpkg);
+    const worker = new Worker(gpkg as unknown as Gpkg);
 
-    const spyHandleBatch = jest.spyOn((worker as unknown) as { handleBatch: () => Promise<void> }, 'handleBatch');
+    const spyHandleBatch = jest.spyOn(worker as unknown as { handleBatch: () => Promise<void> }, 'handleBatch');
 
     await worker.populate(features, 15, tilesDirectory);
 

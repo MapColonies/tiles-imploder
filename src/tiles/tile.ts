@@ -1,4 +1,4 @@
-import { Coordinate } from '../common/interfaces';
+import { Coordinate } from '../common/interfaces/interfaces';
 import { getTileResolution } from '../common/utils';
 
 export class Tile {

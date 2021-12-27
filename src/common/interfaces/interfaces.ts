@@ -16,22 +16,10 @@ export interface IInput {
   footprint: Polygon | MultiPolygon;
   bbox: BBox2d | true;
   zoomLevel: number;
-  tilesFullPath: string;
-  packageName: string;
-  callbackURL: string;
-  expirationTime: Date;
-  dbId: string;
-}
-
-export interface ITaskParameters {
-  callbackURL: string;
-  bbox: BBox2d | true;
-  dbId: string;
-  footprint: Polygon | MultiPolygon;
   tilesPath: string;
-  zoomLevel: number;
   packageName: string;
-  expirationTime: Date;
+  callbackURL: string[];
+  dbId: string;
 }
 
 export interface IGpkgConfig {
@@ -47,24 +35,6 @@ export interface IQueueConfig {
   heartbeatIntervalMs: number;
   jobType: string;
   taskType: string;
-}
-
-export interface IJobData {
-  dbId: string;
-  targetResolution: number;
-  crs: string;
-  callbackURL: string;
-  bbox: BBox2d;
-  priority: number;
-  packageName: string;
-  footprint: Polygon | MultiPolygon;
-  version: string;
-  cswProductId: string;
-  tilesPath: string;
-}
-
-export interface IJobResponse {
-  parameters: IJobData;
 }
 
 export interface ICallbackResponse {

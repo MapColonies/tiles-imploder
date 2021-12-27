@@ -27,7 +27,7 @@ describe('gpkg', () => {
   });
 
   it('should call the create method once initaing a new instance', () => {
-    const createFn = jest.spyOn((Gpkg.prototype as unknown) as { create: () => void }, 'create');
+    const createFn = jest.spyOn(Gpkg.prototype as unknown as { create: () => void }, 'create');
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const gpkg = new Gpkg(mockPath, mockBBox, mockZoomLevel, packageName);
     expect(createFn).toHaveBeenCalledTimes(1);
@@ -40,7 +40,7 @@ describe('gpkg', () => {
     jest.mock('better-sqlite3');
 
     const gpkg = new Gpkg(mockPath, mockBBox, mockZoomLevel, packageName);
-    const execSpy = jest.spyOn(((gpkg as unknown) as { db: SQLiteDB }).db, 'exec');
+    const execSpy = jest.spyOn((gpkg as unknown as { db: SQLiteDB }).db, 'exec');
 
     gpkg.commit();
     expect(execSpy).toHaveBeenCalledTimes(1);
@@ -48,7 +48,7 @@ describe('gpkg', () => {
 
   it('should call CLOSE when trying to CLOSE', () => {
     const gpkg = new Gpkg(mockPath, mockBBox, mockZoomLevel, packageName);
-    const closeSpy = jest.spyOn(((gpkg as unknown) as { db: SQLiteDB }).db, 'close');
+    const closeSpy = jest.spyOn((gpkg as unknown as { db: SQLiteDB }).db, 'close');
 
     gpkg.close();
     expect(closeSpy).toHaveBeenCalledTimes(1);

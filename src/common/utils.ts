@@ -5,7 +5,7 @@ import { Geometry, Feature, Polygon, MultiPolygon, LineString, feature as turfFe
 import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import { Tile } from '../tiles/tile';
 import { COORDINATE_SYSTEM, TILE_AXIS_SIZE } from './constants';
-import { Coordinate } from './interfaces';
+import { Coordinate } from './interfaces/interfaces';
 
 export function getTileResolution(zoomLevel: number): number {
   return COORDINATE_SYSTEM.maxLon / (1 << zoomLevel);

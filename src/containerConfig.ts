@@ -6,7 +6,7 @@ import jsLogger, { LoggerOptions } from '@map-colonies/js-logger';
 import { Metrics } from '@map-colonies/telemetry';
 import { Services } from './common/constants';
 import { tracing } from './common/tracing';
-import { IQueueConfig } from './common/interfaces';
+import { IQueueConfig } from './common/interfaces/interfaces';
 
 function registerExternalValues(): void {
   const loggerConfig = config.get<LoggerOptions>('telemetry.logger');

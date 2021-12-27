@@ -5,7 +5,7 @@ import { container, injectable } from 'tsyringe';
 import { IConfig } from 'config';
 import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import { Services } from '../common/constants';
-import { IGpkgConfig } from '../common/interfaces';
+import { IGpkgConfig } from '../common/interfaces/interfaces';
 import { gpkgSize, snapBBoxToTileGrid } from '../common/utils';
 import { Tile } from '../tiles/tile';
 
