@@ -1,13 +1,12 @@
 import { join } from 'path';
 import { inject, singleton } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
-import { IConfig, IInput, IQueueConfig } from './common/interfaces/interfaces';
+import { IUpdateJobBody, OperationStatus } from '@map-colonies/mc-priority-queue';
+import { IConfig, IInput, IJobParameters, ITaskParameters } from './common/interfaces/interfaces';
 import { TaskHandler } from './taskHandler';
-import { FULL_PRECENTAGE, JobStatus, Services } from './common/constants';
+import { FULL_PRECENTAGE, Services } from './common/constants';
 import { QueueClient } from './clients/queueClient';
-import { ITaskParameters } from './common/interfaces/tasks';
 import { JobManagerClient } from './clients/jobManagerClient';
-
 @singleton()
 export class TaskManager {
   private readonly maxAttempts: number;
@@ -17,24 +16,24 @@ export class TaskManager {
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
     @inject(Services.CONFIG) private readonly config: IConfig,
-    @inject(Services.QUEUE_CONFIG) private readonly queueConfig: IQueueConfig,
     private readonly queueClient: QueueClient,
     private readonly taskHandler: TaskHandler,
     private readonly jobManagerClient: JobManagerClient
   ) {
     this.logger = logger;
-    this.maxAttempts = config.get<number>('maxAttempts');
-    this.tilesDirectoryPath = config.get<string>('tilesDirectoryPath');
-    this.expirationDate = config.get<number>('queue.expirationDate');
+    this.maxAttempts = this.config.get<number>('maxAttempts');
+    this.tilesDirectoryPath = this.config.get<string>('tilesDirectoryPath');
+    this.expirationDate = this.config.get<number>('queue.expirationDate');
   }
 
   public async work(): Promise<void> {
-    const data = await this.queueClient.queueHandler.waitForTask();
+    const data = await this.queueClient.queueHandler.waitForTask<ITaskParameters>();
     if (data) {
-      const { attempts, jobId, id: taskId, parameters } = <{ attempts: number; jobId: string; id: string; parameters: ITaskParameters }>data;
+      const { attempts, id: taskId, parameters } = data;
+      const jobId = data.jobId as string;
 
       const input: IInput = {
-        jobId,
+        jobId: jobId,
         footprint: parameters.footprint,
         bbox: parameters.bbox,
         zoomLevel: parameters.zoomLevel,
@@ -49,13 +48,13 @@ export class TaskManager {
         this.logger.info(`Succesfully populated GPKG for jobId=${jobId}, taskId=${taskId} with tiles`);
         await this.finalizeJob(input);
         this.logger.info(`Call task ack jobId=${jobId}, taskId=${taskId}`);
-        await this.queueClient.queueHandler.ack(jobId, taskId);
+        await this.queueClient.queueHandler.ack<ITaskParameters>(jobId, taskId);
       } catch (error) {
         if (attempts >= this.maxAttempts) {
-          await this.queueClient.queueHandler.reject(jobId, taskId, false);
+          await this.queueClient.queueHandler.reject<ITaskParameters>(jobId, taskId, false);
           await this.finalizeJob(input, false, (error as Error).message);
         } else {
-          await this.queueClient.queueHandler.reject(jobId, taskId, true, (error as Error).message);
+          await this.queueClient.queueHandler.reject<ITaskParameters>(jobId, taskId, true, (error as Error).message);
           this.logger.error(`Error: jobId=${jobId}, taskId=${taskId}, ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
         }
       }
@@ -65,19 +64,20 @@ export class TaskManager {
   private async finalizeJob(input: IInput, isSuccess = true, reason?: string): Promise<void> {
     this.logger.debug(`Getting job with id ${input.jobId}`);
     const jobData = await this.jobManagerClient.getJob(input.jobId);
-    const callbackParams = await this.taskHandler.sendCallback(
-      input,
-      jobData.parameters.targetResolution,
-      jobData.expirationDate,
-      jobData.parameters.callbackURL,
-      reason
-    );
 
     const expirationDate = new Date();
     expirationDate.setDate(expirationDate.getDate() + this.expirationDate);
 
-    const updateJobParams = {
-      status: isSuccess ? JobStatus.COMPLETED : JobStatus.FAILED,
+    const callbackParams = await this.taskHandler.sendCallback(
+      input,
+      jobData.parameters.targetResolution,
+      expirationDate,
+      jobData.parameters.callbackURL,
+      reason
+    );
+
+    const updateJobParams: IUpdateJobBody<IJobParameters> = {
+      status: isSuccess ? OperationStatus.COMPLETED : OperationStatus.FAILED,
       reason,
       percentage: isSuccess ? FULL_PRECENTAGE : undefined,
       expirationDate,
