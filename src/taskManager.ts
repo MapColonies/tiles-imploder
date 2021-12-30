@@ -39,7 +39,7 @@ export class TaskManager {
         zoomLevel: parameters.zoomLevel,
         tilesPath: join(this.tilesDirectoryPath, parameters.tilesPath),
         packageName: parameters.packageName,
-        callbackURL: parameters.callbackURL,
+        callbackURLs: parameters.callbackURLs,
         dbId: parameters.dbId,
       };
 
@@ -62,17 +62,16 @@ export class TaskManager {
   }
 
   private async finalizeJob(input: IInput, isSuccess = true, reason?: string): Promise<void> {
-    this.logger.debug(`Getting job with id ${input.jobId}`);
     const jobData = await this.jobManagerClient.getJob(input.jobId);
 
     const expirationDate = new Date();
     expirationDate.setDate(expirationDate.getDate() + this.expirationDate);
 
-    const callbackParams = await this.taskHandler.sendCallback(
+    const callbackParams = await this.taskHandler.sendCallbacks(
       input,
       jobData.parameters.targetResolution,
       expirationDate,
-      jobData.parameters.callbackURL,
+      jobData.parameters.callbackURLs,
       reason
     );
 

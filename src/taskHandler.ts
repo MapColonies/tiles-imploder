@@ -49,7 +49,7 @@ export class TaskHandler {
     await worker.buildOverviews(intersectionBbox, input.zoomLevel);
   }
 
-  public async sendCallback(
+  public async sendCallbacks(
     input: IInput,
     targetResolution: number,
     expirationDate: Date,
@@ -83,12 +83,10 @@ export class TaskHandler {
         callbackPromises.push(this.callbackClient.send(url, callbackParams));
       }
 
-      await Promise.all(callbackPromises);
+      await Promise.allSettled(callbackPromises);
       return callbackParams;
     } catch (error) {
-      this.logger.error(
-        `Failed to send callback to ${input.callbackURL.toString()}, error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`
-      );
+      this.logger.error(`Failed to send callback. error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
     }
   }
 

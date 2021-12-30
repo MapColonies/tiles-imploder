@@ -25,6 +25,7 @@ data:
   QUEUE_HEARTBEAT_INTERVAL_MS: {{ .Values.env.queue.heartbeatIntervalMs | quote }}
   QUEUE_JOB_TYPE: {{ .Values.env.queue.jobType | quote }}
   QUEUE_TASK_TYPE: {{ .Values.env.queue.taskType | quote }}
+  QUEUE_EXPIRATION_DATE: {{ .Values.env.queue.expirationDate | quote}}
   DOWNLOAD_SERVER_URL: {{ .Values.env.downloadServerUrl | quote }}
   MAX_ATTEMPTS: {{ .Values.env.maxAttempts | quote }}
   GEOHASH_PRECISION: {{ .Values.env.geohash.precision | quote}}

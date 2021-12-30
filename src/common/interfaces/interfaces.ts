@@ -18,7 +18,7 @@ export interface IInput {
   zoomLevel: number;
   tilesPath: string;
   packageName: string;
-  callbackURL: string[];
+  callbackURLs: string[];
   dbId: string;
 }
 
@@ -53,7 +53,7 @@ export interface IJobParameters {
   dbId: string;
   targetResolution: number;
   crs: string;
-  callbackURL: string[];
+  callbackURLs: string[];
   bbox: BBox2d;
   priority: number;
   packageName: string;
@@ -65,7 +65,7 @@ export interface IJobParameters {
 }
 
 export interface ITaskParameters {
-  callbackURL: string[];
+  callbackURLs: string[];
   bbox: BBox2d | true;
   dbId: string;
   footprint: Polygon | MultiPolygon;

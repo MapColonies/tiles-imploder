@@ -13,13 +13,14 @@ export class JobManagerClient extends HttpClient {
   }
 
   public async getJob(jobId: string): Promise<IJobResponse<IJobParameters, ITaskParameters>> {
-    this.logger.debug(`Retrieving job ${jobId}`);
+    this.logger.info(`Retrieving job ${jobId}`);
     const job = await this.get<IJobResponse<IJobParameters, ITaskParameters>>(`/jobs/${jobId}`);
     return job;
   }
 
   public async updateJob(jobId: string, payload: IUpdateJobBody<IJobParameters>): Promise<void> {
-    this.logger.debug(`Updating job ${jobId} with payload ${JSON.stringify(payload)}`);
+    this.logger.info(`Updating job ${jobId}`);
+    this.logger.debug(`Payload is: ${JSON.stringify(payload)}`);
     const updateJobUrl = `/jobs/${jobId}`;
     await this.put(updateJobUrl, payload);
   }
