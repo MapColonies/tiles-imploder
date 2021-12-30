@@ -7,6 +7,7 @@ import { TaskHandler } from './taskHandler';
 import { FULL_PRECENTAGE, Services } from './common/constants';
 import { QueueClient } from './clients/queueClient';
 import { JobManagerClient } from './clients/jobManagerClient';
+
 @singleton()
 export class TaskManager {
   private readonly maxAttempts: number;
