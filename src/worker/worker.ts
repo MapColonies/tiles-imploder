@@ -1,15 +1,16 @@
 import { promisify } from 'util';
 import { exec } from 'child_process';
+import { promises as fsPromise } from 'fs';
 import { Feature } from '@turf/helpers';
 import { Logger } from '@map-colonies/js-logger';
 import { container, injectable } from 'tsyringe';
 import { IConfig } from 'config';
-import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
+import { BBox2d, MultiPolygon, Polygon } from '@turf/helpers/dist/js/lib/geojson';
+import { ITileRange, TileRanger } from '@map-colonies/mc-utils';
 import { Gpkg } from '../gpkg/gpkg';
 import { Services } from '../common/constants';
 import { Tile } from '../tiles/tile';
-import { TileGenerator } from '../tiles/tilesGenerator';
-import { getPixelResolution, snapBBoxToTileGrid } from '../common/utils';
+import { getPixelResolution, snapBBoxToTileGrid, tilesCountPerZoom } from '../common/utils';
 
 @injectable()
 export class Worker {
@@ -25,20 +26,10 @@ export class Worker {
     this.batchSize = this.config.get<number>('batchSize');
   }
 
-  public async populate(features: Feature[], maxZoomLevel: number, tileDirectory: string): Promise<void> {
-    for (const feat of features) {
-      if (feat.bbox) {
-        const firstCoordinate = { lon: feat.bbox[0], lat: feat.bbox[1] };
-        const secondCoordinate = { lon: feat.bbox[2], lat: feat.bbox[3] };
-
-        const startTile = Tile.fromULCoordinate(firstCoordinate, maxZoomLevel);
-        const endTile = Tile.fromULCoordinate(secondCoordinate, maxZoomLevel);
-        const generator = new TileGenerator(startTile, endTile, tileDirectory).generator;
-        await this.handleBatch(generator);
-      } else {
-        throw new Error(`Could not populate GPKG with feature ${JSON.stringify(feat)} - no BBOX supplied`);
-      }
-    }
+  public async populate(intersection: Feature<Polygon | MultiPolygon>, maxZoomLevel: number, tilesDirectory: string): Promise<void> {
+    const tileGroups = new TileRanger().encodeFootprint(intersection, maxZoomLevel);
+    const tilesGen = this.tilesGenerator(tileGroups, tilesDirectory);
+    await this.handleBatch(tilesGen);
   }
 
   public async buildOverviews(bbox: BBox2d, zoomLevel: number): Promise<void> {
@@ -70,8 +61,8 @@ export class Worker {
   private async handleBatch(tileGenerator: AsyncGenerator<Tile>): Promise<void> {
     let tilesBatch: Tile[] = [];
 
-    for await (const currentTile of tileGenerator) {
-      tilesBatch.push(currentTile);
+    for await (const tile of tileGenerator) {
+      tilesBatch.push(tile);
       if (tilesBatch.length === this.batchSize) {
         this.db.insertTiles(tilesBatch);
         tilesBatch = [];
@@ -84,21 +75,40 @@ export class Worker {
   private calculateOverviews(bbox: BBox2d, zoomLevel: number): number[] {
     const lonDiff = bbox[2] - bbox[0];
     const latDiff = bbox[3] - bbox[1];
-
     let overviewFactor = 2;
     const overviews: number[] = [];
 
     // Overviews are built 1 zoom level before the maximum zoom level
     const maxOverviewZoom = zoomLevel - 1;
     let pixelSize = getPixelResolution(maxOverviewZoom);
+    let overviewCounter = maxOverviewZoom;
 
-    while (lonDiff >= pixelSize && latDiff >= pixelSize) {
+    while (lonDiff >= pixelSize && latDiff >= pixelSize && overviewCounter >= 0) {
       overviews.push(overviewFactor);
       overviewFactor = overviewFactor << 1;
       // eslint-disable-next-line @typescript-eslint/no-magic-numbers
       pixelSize = pixelSize * 2;
+      overviewCounter--;
     }
 
     return overviews;
+  }
+
+  private async *tilesGenerator(rangeGen: Iterable<ITileRange>, tilesDirectory: string): AsyncGenerator<Tile> {
+    for (const range of rangeGen) {
+      const tilesInZoomLevel = tilesCountPerZoom(range.zoom);
+      for (let x = range.minX; x <= range.maxX; x++) {
+        for (let lowerLeftY = range.minY; lowerLeftY <= range.maxY; lowerLeftY++) {
+          const upperLeftY = tilesInZoomLevel - lowerLeftY;
+          const fileLocation = `${tilesDirectory}/${range.zoom}/${x}/${lowerLeftY}.png`;
+          try {
+            const blob = await fsPromise.readFile(fileLocation);
+            yield { z: range.zoom, x, y: upperLeftY, tileData: blob };
+          } catch (err) {
+            this.logger.info(`Could not find tile: ${fileLocation}`);
+          }
+        }
+      }
+    }
   }
 }

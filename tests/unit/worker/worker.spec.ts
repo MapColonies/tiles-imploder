@@ -5,17 +5,7 @@ import { Services } from '../../../src/common/constants';
 import { Gpkg } from '../../../src/gpkg/gpkg';
 import { Worker } from '../../../src/worker/worker';
 import * as Utils from '../../../src/common/utils';
-import { Tile } from '../../../src/tiles/tile';
-import { mockTile, features } from '../mockData';
-
-jest.mock('../../../src/tiles/tilesGenerator', () => {
-  return {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    TileGenerator: jest.fn().mockImplementation(() => {
-      return { generator: jest.fn };
-    }),
-  };
-});
+import { features } from '../mockData';
 
 describe('worker', () => {
   beforeEach(() => {
@@ -53,8 +43,6 @@ describe('worker', () => {
     };
     const tilesDirectory = '/mock';
 
-    const tileFromCoordSpy = jest.spyOn(Tile, 'fromULCoordinate').mockReturnValueOnce(mockTile).mockReturnValueOnce(mockTile);
-
     const worker = new Worker(gpkg as unknown as Gpkg);
 
     const spyHandleBatch = jest.spyOn(worker as unknown as { handleBatch: () => Promise<void> }, 'handleBatch');
@@ -62,6 +50,5 @@ describe('worker', () => {
     await worker.populate(features, 15, tilesDirectory);
 
     expect(spyHandleBatch).toHaveBeenCalled();
-    expect(tileFromCoordSpy).toHaveBeenCalled();
   });
 });

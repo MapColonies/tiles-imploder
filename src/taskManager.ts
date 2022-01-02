@@ -46,10 +46,10 @@ export class TaskManager {
 
       try {
         await this.taskHandler.run(input);
-        this.logger.info(`Succesfully populated GPKG for jobId=${jobId}, taskId=${taskId} with tiles`);
-        await this.finalizeJob(input);
+        this.logger.debug(`Succesfully populated GPKG for jobId=${jobId}, taskId=${taskId} with tiles`);
         this.logger.info(`Call task ack jobId=${jobId}, taskId=${taskId}`);
         await this.queueClient.queueHandler.ack<ITaskParameters>(jobId, taskId);
+        await this.finalizeJob(input);
       } catch (error) {
         if (attempts >= this.maxAttempts) {
           await this.queueClient.queueHandler.reject<ITaskParameters>(jobId, taskId, false);

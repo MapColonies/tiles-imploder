@@ -21,6 +21,10 @@ export function degreesPerTile(zoomLevel: number): number {
   return latRange / (1 << zoomLevel);
 }
 
+export function tilesCountPerZoom(zoomLevel: number): number {
+  return (1 << zoomLevel) - 1;
+}
+
 export function snapBBoxToTileGrid(bbox: BBox2d, zoomLevel: number): BBox2d {
   const tileGridBBox: number[] = [];
   const minLon = Math.min(bbox[0], bbox[2]);
