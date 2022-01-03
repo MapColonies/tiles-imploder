@@ -1,31 +1,26 @@
 import { promises as fsPromise } from 'fs';
 import { Logger } from '@map-colonies/js-logger';
-import { BBox2d, Feature } from '@turf/helpers/dist/js/lib/geojson';
 import { IConfig } from 'config';
 import { inject, singleton } from 'tsyringe';
 import polygonToBBox from '@turf/bbox';
+import { BBox } from '@turf/helpers';
 import { Services } from './common/constants';
-import { ICallbackResponse, IGpkgConfig, IInput, IJobData } from './common/interfaces';
-import { GeoHash } from './geohash/geohash';
+import { ICallbackResponse, IGpkgConfig, IInput } from './common/interfaces/interfaces';
 import { Gpkg } from './gpkg/gpkg';
 import { Worker } from './worker/worker';
 import { intersect } from './common/utils';
 import { CallbackClient } from './clients/callbackClient';
-import { QueueClient } from './clients/queueClient';
 
 @singleton()
 export class TaskHandler {
-  private readonly geohash: GeoHash;
   private readonly gpkgConfig: IGpkgConfig;
   private readonly downloadServerUrl: string;
 
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
     @inject(Services.CONFIG) private readonly config: IConfig,
-    private readonly callbackClient: CallbackClient,
-    private readonly queueClient: QueueClient
+    private readonly callbackClient: CallbackClient
   ) {
-    this.geohash = new GeoHash();
     this.gpkgConfig = this.config.get<IGpkgConfig>('gpkg');
     this.downloadServerUrl = this.config.get<string>('downloadServerUrl');
   }
@@ -34,8 +29,7 @@ export class TaskHandler {
     const gpkgFullPath = this.getGPKGPath(input.packageName);
 
     const intersection = intersect(input.footprint, input.bbox);
-    const features: Feature[] = (await this.geohash.geojson2geohash(intersection)).map((geohash: string) => this.geohash.decode(geohash));
-    const intersectionBbox: BBox2d = polygonToBBox(intersection) as BBox2d;
+    const intersectionBbox: BBox = polygonToBBox(intersection);
 
     const db = new Gpkg(gpkgFullPath, intersectionBbox, input.zoomLevel, input.packageName);
 
@@ -45,18 +39,21 @@ export class TaskHandler {
     this.logger.info(`Updating DB extents ${JSON.stringify(input)}`);
     worker.updateExtent(intersectionBbox, input.zoomLevel);
     this.logger.info(`Populating ${gpkgFullPath} with bbox ${JSON.stringify(input.bbox)} until zoom level ${input.zoomLevel}`);
-    await worker.populate(features, input.zoomLevel, input.tilesFullPath);
+    await worker.populate(intersection, input.zoomLevel, input.tilesPath);
 
     this.logger.info(`Building overviews in ${gpkgFullPath}`);
     await worker.buildOverviews(intersectionBbox, input.zoomLevel);
   }
 
-  public async sendCallback(input: IInput, errorReason?: string): Promise<void> {
+  public async sendCallbacks(
+    input: IInput,
+    targetResolution: number,
+    expirationDate: Date,
+    callbackURLs: string[],
+    errorReason?: string
+  ): Promise<ICallbackResponse | undefined> {
     try {
       const gpkgFullPath = this.getGPKGPath(input.packageName);
-      this.logger.info(`Get Job Params for: ${input.jobId}`);
-      const jobData = await this.queueClient.queueHandler.jobManagerClient.getJob(input.jobId);
-      const targetResolution = (jobData?.parameters as IJobData).targetResolution;
       const success = errorReason === undefined;
       let fileSize = 0;
       if (success) {
@@ -66,7 +63,7 @@ export class TaskHandler {
       const fileUri = `${this.downloadServerUrl}/${input.packageName}.gpkg`;
       const callbackParams: ICallbackResponse = {
         fileUri,
-        expirationTime: input.expirationTime,
+        expirationTime: expirationDate,
         fileSize,
         dbId: input.dbId,
         packageName: input.packageName,
@@ -77,9 +74,21 @@ export class TaskHandler {
         errorReason,
       };
 
-      await this.callbackClient.send(input.callbackURL, callbackParams);
+      const callbackPromises: Promise<void>[] = [];
+      for (const url of callbackURLs) {
+        callbackPromises.push(this.callbackClient.send(url, callbackParams));
+      }
+
+      const promisesResponse = await Promise.allSettled(callbackPromises);
+      promisesResponse.forEach((response, index) => {
+        if (response.status === 'rejected') {
+          this.logger.error(`Failed not send callback to ${callbackURLs[index]}, got error: ${JSON.stringify(response.reason)}`);
+        }
+      });
+
+      return callbackParams;
     } catch (error) {
-      this.logger.error(`Failed to send callback to ${input.callbackURL}, error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
+      this.logger.error(`Sending callbacks has failed with error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
     }
   }
 

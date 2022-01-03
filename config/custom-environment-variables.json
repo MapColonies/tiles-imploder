@@ -44,7 +44,11 @@
     "dequeueIntervalMs": "QUEUE_DEQUEUE_INTERVAL_MS",
     "heartbeatIntervalMs": "QUEUE_HEARTBEAT_INTERVAL_MS",
     "jobType": "QUEUE_JOB_TYPE",
-    "taskType": "QUEUE_TASK_TYPE"
+    "taskType": "QUEUE_TASK_TYPE",
+    "expirationDate": {
+      "__name": "QUEUE_EXPIRATION_DATE",
+      "__format": "number"
+    }
   },
   "maxAttempts": {
     "__name": "MAX_ATTEMPTS",

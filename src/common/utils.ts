@@ -1,11 +1,10 @@
 import turfIntersect from '@turf/intersect';
 import turfBBoxPolygon from '@turf/bbox-polygon';
 import turfLineStringToPolygon from '@turf/line-to-polygon';
-import { Geometry, Feature, Polygon, MultiPolygon, LineString, feature as turfFeature } from '@turf/helpers';
-import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
+import { Geometry, Feature, Polygon, MultiPolygon, LineString, feature as turfFeature, BBox } from '@turf/helpers';
 import { Tile } from '../tiles/tile';
 import { COORDINATE_SYSTEM, TILE_AXIS_SIZE } from './constants';
-import { Coordinate } from './interfaces';
+import { Coordinate } from './interfaces/interfaces';
 
 export function getTileResolution(zoomLevel: number): number {
   return COORDINATE_SYSTEM.maxLon / (1 << zoomLevel);
@@ -21,7 +20,11 @@ export function degreesPerTile(zoomLevel: number): number {
   return latRange / (1 << zoomLevel);
 }
 
-export function snapBBoxToTileGrid(bbox: BBox2d, zoomLevel: number): BBox2d {
+export function tilesCountPerZoom(zoomLevel: number): number {
+  return (1 << zoomLevel) - 1;
+}
+
+export function snapBBoxToTileGrid(bbox: BBox, zoomLevel: number): BBox {
   const tileGridBBox: number[] = [];
   const minLon = Math.min(bbox[0], bbox[2]);
   const minLat = Math.min(bbox[1], bbox[3]);
@@ -38,14 +41,14 @@ export function snapBBoxToTileGrid(bbox: BBox2d, zoomLevel: number): BBox2d {
   if (tileGridBBox[3] != maxLat) {
     tileGridBBox[3] += tileRes;
   }
-  return tileGridBBox as BBox2d;
+  return tileGridBBox as BBox;
 }
 
 export function snapMinCordToTileGrid(cord: number, tileRes: number): number {
   return cord - Math.abs(cord % tileRes);
 }
 
-export function gpkgSize(bbox: BBox2d, zoomLevel: number): [number, number] {
+export function gpkgSize(bbox: BBox, zoomLevel: number): [number, number] {
   const extent = snapBBoxToTileGrid(bbox, zoomLevel);
   const pixelRes = getPixelResolution(zoomLevel);
 
@@ -71,7 +74,7 @@ export function toBBox(minTile: Tile, maxTile: Tile): [Coordinate, Coordinate] {
   ];
 }
 
-export function intersect(footprint: Geometry, bbox: BBox2d | true): Feature<Polygon | MultiPolygon> {
+export function intersect(footprint: Geometry, bbox: BBox | true): Feature<Polygon | MultiPolygon> {
   let footprintPolygon: Polygon | MultiPolygon;
 
   switch (footprint.type) {

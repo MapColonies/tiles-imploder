@@ -6,7 +6,7 @@ import { inject, injectable } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import httpLogger from '@map-colonies/express-access-log-middleware';
 import { Services } from './common/constants';
-import { IConfig } from './common/interfaces';
+import { IConfig } from './common/interfaces/interfaces';
 
 @injectable()
 export class ServerBuilder {

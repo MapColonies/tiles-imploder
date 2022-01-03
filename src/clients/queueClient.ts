@@ -1,7 +1,7 @@
 import { TaskHandler as QueueHandler } from '@map-colonies/mc-priority-queue';
 import { inject, singleton } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
-import { IQueueConfig } from '../common/interfaces';
+import { IQueueConfig } from '../common/interfaces/interfaces';
 import { Services } from '../common/constants';
 
 @singleton()

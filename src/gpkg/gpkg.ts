@@ -3,9 +3,9 @@ import Database, { Database as SQLiteDB } from 'better-sqlite3';
 import { Logger } from '@map-colonies/js-logger';
 import { container, injectable } from 'tsyringe';
 import { IConfig } from 'config';
-import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
+import { BBox } from '@turf/helpers';
 import { Services } from '../common/constants';
-import { IGpkgConfig } from '../common/interfaces';
+import { IGpkgConfig } from '../common/interfaces/interfaces';
 import { gpkgSize, snapBBoxToTileGrid } from '../common/utils';
 import { Tile } from '../tiles/tile';
 
@@ -15,12 +15,12 @@ export class Gpkg {
   private readonly logger: Logger;
   private readonly db: SQLiteDB;
   private readonly config: IConfig;
-  private readonly extent: BBox2d;
+  private readonly extent: BBox;
   private readonly maxZoomLevel: number;
   private readonly packageName: string;
   private gpkgConfig?: IGpkgConfig;
 
-  public constructor(path: string, extent: BBox2d, zoomLevel: number, packageName: string) {
+  public constructor(path: string, extent: BBox, zoomLevel: number, packageName: string) {
     this.path = path;
     this.extent = extent;
     this.maxZoomLevel = zoomLevel;

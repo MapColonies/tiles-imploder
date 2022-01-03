@@ -22,3 +22,11 @@ export const COORDINATE_SYSTEM = {
   minLon: -180,
 };
 export const FULL_PRECENTAGE = 100;
+
+export enum JobStatus {
+  PENDING = 'Pending',
+  IN_PROGRESS = 'In-Progress',
+  FAILED = 'Failed',
+  COMPLETED = 'Completed',
+  EXPIRED = 'Expired',
+}

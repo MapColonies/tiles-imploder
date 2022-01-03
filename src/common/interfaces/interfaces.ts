@@ -1,5 +1,4 @@
-import { MultiPolygon, Polygon } from '@turf/helpers';
-import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
+import { Polygon, MultiPolygon, BBox } from '@turf/helpers';
 
 export interface IConfig {
   get: <T>(setting: string) => T;
@@ -14,24 +13,12 @@ export interface Coordinate {
 export interface IInput {
   jobId: string;
   footprint: Polygon | MultiPolygon;
-  bbox: BBox2d | true;
+  bbox: BBox | true;
   zoomLevel: number;
-  tilesFullPath: string;
-  packageName: string;
-  callbackURL: string;
-  expirationTime: Date;
-  dbId: string;
-}
-
-export interface ITaskParameters {
-  callbackURL: string;
-  bbox: BBox2d | true;
-  dbId: string;
-  footprint: Polygon | MultiPolygon;
   tilesPath: string;
-  zoomLevel: number;
   packageName: string;
-  expirationTime: Date;
+  callbackURLs: string[];
+  dbId: string;
 }
 
 export interface IGpkgConfig {
@@ -49,33 +36,42 @@ export interface IQueueConfig {
   taskType: string;
 }
 
-export interface IJobData {
-  dbId: string;
-  targetResolution: number;
-  crs: string;
-  callbackURL: string;
-  bbox: BBox2d;
-  priority: number;
-  packageName: string;
-  footprint: Polygon | MultiPolygon;
-  version: string;
-  cswProductId: string;
-  tilesPath: string;
-}
-
-export interface IJobResponse {
-  parameters: IJobData;
-}
-
 export interface ICallbackResponse {
   fileUri: string;
   expirationTime: Date;
   fileSize: number;
   dbId: string;
   packageName: string;
-  bbox: BBox2d | true;
+  bbox: BBox | true;
   targetResolution: number;
   requestId: string;
   success: boolean;
   errorReason?: string;
+}
+export interface IJobParameters {
+  dbId: string;
+  targetResolution: number;
+  crs: string;
+  callbackURLs: string[];
+  bbox: BBox;
+  priority: number;
+  packageName: string;
+  footprint: Polygon | MultiPolygon;
+  version: string;
+  cswProductId: string;
+  tilesPath: string;
+  callbackParams?: ICallbackResponse;
+}
+
+export interface ITaskParameters {
+  callbackURLs: string[];
+  bbox: BBox | true;
+  dbId: string;
+  footprint: Polygon | MultiPolygon;
+  tilesPath: string;
+  zoomLevel: number;
+  packageName: string;
+  productType: string;
+  crs: string;
+  priority: number;
 }

@@ -2,7 +2,7 @@ import { inject, singleton } from 'tsyringe';
 import { HttpClient, IHttpRetryConfig } from '@map-colonies/mc-utils';
 import { Logger } from '@map-colonies/js-logger';
 import { Services } from '../common/constants';
-import { ICallbackResponse, IConfig } from '../common/interfaces';
+import { ICallbackResponse, IConfig } from '../common/interfaces/interfaces';
 
 @singleton()
 export class CallbackClient extends HttpClient {

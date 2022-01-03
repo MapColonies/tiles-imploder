@@ -27,7 +27,8 @@
     "dequeueIntervalMs": 1000,
     "heartbeatIntervalMs": 300,
     "jobType": "rasterTilesExporter",
-    "taskType": "rasterTilesExporter"
+    "taskType": "rasterTilesExporter",
+    "expirationDate": 30
   },
   "maxAttempts": 3,
   "geohash": {
