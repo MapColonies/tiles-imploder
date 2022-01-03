@@ -37,8 +37,6 @@ describe('gpkg', () => {
   });
 
   it('should call EXEC when trying to COMMIT', () => {
-    jest.mock('better-sqlite3');
-
     const gpkg = new Gpkg(mockPath, mockBBox, mockZoomLevel, packageName);
     const execSpy = jest.spyOn((gpkg as unknown as { db: SQLiteDB }).db, 'exec');
 

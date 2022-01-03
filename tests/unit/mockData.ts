@@ -1,5 +1,4 @@
-import { Feature } from '@turf/helpers';
-import { BBox2d, Polygon } from '@turf/helpers/dist/js/lib/geojson';
+import { BBox, Feature, Polygon } from '@turf/helpers';
 import { Tile } from '../../src/tiles/tile';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers*/
@@ -26,7 +25,7 @@ export const mockTile = { x: 1, y: 1, z: 2, tileData: Buffer.alloc(10) };
 export const mockTiles: Tile[] = [mockTile, mockTile, mockTile];
 
 export const mockPath = '/etc/gpkg.gpkg';
-export const mockBBox: BBox2d = [0, 0, 1, 1];
+export const mockBBox: BBox = [0, 0, 1, 1];
 export const mockZoomLevel = 18;
 
 export const geohashString = 'gbsuv7z';

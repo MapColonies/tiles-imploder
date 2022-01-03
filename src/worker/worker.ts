@@ -1,11 +1,10 @@
 import { promisify } from 'util';
 import { exec } from 'child_process';
 import { promises as fsPromise } from 'fs';
-import { Feature } from '@turf/helpers';
+import { BBox, Feature, MultiPolygon, Polygon } from '@turf/helpers';
 import { Logger } from '@map-colonies/js-logger';
 import { container, injectable } from 'tsyringe';
 import { IConfig } from 'config';
-import { BBox2d, MultiPolygon, Polygon } from '@turf/helpers/dist/js/lib/geojson';
 import { ITileRange, TileRanger } from '@map-colonies/mc-utils';
 import { Gpkg } from '../gpkg/gpkg';
 import { Services } from '../common/constants';
@@ -32,7 +31,7 @@ export class Worker {
     await this.handleBatch(tilesGen);
   }
 
-  public async buildOverviews(bbox: BBox2d, zoomLevel: number): Promise<void> {
+  public async buildOverviews(bbox: BBox, zoomLevel: number): Promise<void> {
     const promiseExec = promisify(exec);
 
     const resamplingMethod = this.config.get<string>('gpkg.resampling');
@@ -51,7 +50,7 @@ export class Worker {
     }
   }
 
-  public updateExtent(bbox: BBox2d, zoomLevel: number): void {
+  public updateExtent(bbox: BBox, zoomLevel: number): void {
     const extent = snapBBoxToTileGrid(bbox, zoomLevel);
 
     const sql = `UPDATE gpkg_contents SET min_x = ?, min_y = ?, max_x = ?, max_y = ?`;
@@ -72,7 +71,7 @@ export class Worker {
     this.db.insertTiles(tilesBatch); // Insert left overs of last bulk
   }
 
-  private calculateOverviews(bbox: BBox2d, zoomLevel: number): number[] {
+  private calculateOverviews(bbox: BBox, zoomLevel: number): number[] {
     const lonDiff = bbox[2] - bbox[0];
     const latDiff = bbox[3] - bbox[1];
     let overviewFactor = 2;
@@ -97,8 +96,8 @@ export class Worker {
   private async *tilesGenerator(rangeGen: Iterable<ITileRange>, tilesDirectory: string): AsyncGenerator<Tile> {
     for (const range of rangeGen) {
       const tilesInZoomLevel = tilesCountPerZoom(range.zoom);
-      for (let x = range.minX; x <= range.maxX; x++) {
-        for (let lowerLeftY = range.minY; lowerLeftY <= range.maxY; lowerLeftY++) {
+      for (let x = range.minX; x < range.maxX; x++) {
+        for (let lowerLeftY = range.minY; lowerLeftY < range.maxY; lowerLeftY++) {
           const upperLeftY = tilesInZoomLevel - lowerLeftY;
           const fileLocation = `${tilesDirectory}/${range.zoom}/${x}/${lowerLeftY}.png`;
           try {

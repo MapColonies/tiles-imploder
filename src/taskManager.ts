@@ -46,7 +46,6 @@ export class TaskManager {
 
       try {
         await this.taskHandler.run(input);
-        this.logger.debug(`Succesfully populated GPKG for jobId=${jobId}, taskId=${taskId} with tiles`);
         this.logger.info(`Call task ack jobId=${jobId}, taskId=${taskId}`);
         await this.queueClient.queueHandler.ack<ITaskParameters>(jobId, taskId);
         await this.finalizeJob(input);

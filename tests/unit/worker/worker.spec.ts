@@ -1,6 +1,6 @@
-import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import config from 'config';
 import { container } from 'tsyringe';
+import { BBox } from '@turf/helpers';
 import { Services } from '../../../src/common/constants';
 import { Gpkg } from '../../../src/gpkg/gpkg';
 import { Worker } from '../../../src/worker/worker';
@@ -28,7 +28,7 @@ describe('worker', () => {
     const worker = new Worker(gpkg as unknown as Gpkg);
     const spy = jest.spyOn(Utils, 'snapBBoxToTileGrid');
 
-    const mockBBox: BBox2d = [0, 0, 1, 1];
+    const mockBBox: BBox = [0, 0, 1, 1];
     const mockZoomLevel = 12;
     worker.updateExtent(mockBBox, mockZoomLevel);
 

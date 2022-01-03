@@ -1,9 +1,9 @@
 import { promises as fsPromise } from 'fs';
 import { Logger } from '@map-colonies/js-logger';
-import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import { IConfig } from 'config';
 import { inject, singleton } from 'tsyringe';
 import polygonToBBox from '@turf/bbox';
+import { BBox } from '@turf/helpers';
 import { Services } from './common/constants';
 import { ICallbackResponse, IGpkgConfig, IInput } from './common/interfaces/interfaces';
 import { Gpkg } from './gpkg/gpkg';
@@ -29,7 +29,7 @@ export class TaskHandler {
     const gpkgFullPath = this.getGPKGPath(input.packageName);
 
     const intersection = intersect(input.footprint, input.bbox);
-    const intersectionBbox: BBox2d = polygonToBBox(intersection) as BBox2d;
+    const intersectionBbox: BBox = polygonToBBox(intersection);
 
     const db = new Gpkg(gpkgFullPath, intersectionBbox, input.zoomLevel, input.packageName);
 

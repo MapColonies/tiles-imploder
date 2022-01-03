@@ -1,5 +1,4 @@
-import { Polygon, MultiPolygon } from '@turf/helpers';
-import { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
+import { Polygon, MultiPolygon, BBox } from '@turf/helpers';
 
 export interface IConfig {
   get: <T>(setting: string) => T;
@@ -14,7 +13,7 @@ export interface Coordinate {
 export interface IInput {
   jobId: string;
   footprint: Polygon | MultiPolygon;
-  bbox: BBox2d | true;
+  bbox: BBox | true;
   zoomLevel: number;
   tilesPath: string;
   packageName: string;
@@ -43,7 +42,7 @@ export interface ICallbackResponse {
   fileSize: number;
   dbId: string;
   packageName: string;
-  bbox: BBox2d | true;
+  bbox: BBox | true;
   targetResolution: number;
   requestId: string;
   success: boolean;
@@ -54,7 +53,7 @@ export interface IJobParameters {
   targetResolution: number;
   crs: string;
   callbackURLs: string[];
-  bbox: BBox2d;
+  bbox: BBox;
   priority: number;
   packageName: string;
   footprint: Polygon | MultiPolygon;
@@ -66,7 +65,7 @@ export interface IJobParameters {
 
 export interface ITaskParameters {
   callbackURLs: string[];
-  bbox: BBox2d | true;
+  bbox: BBox | true;
   dbId: string;
   footprint: Polygon | MultiPolygon;
   tilesPath: string;
