@@ -39,6 +39,9 @@ spec:
       - name: internal-storage
         persistentVolumeClaim:
           claimName: {{ .Values.storage.internalPvc.name }} 
+      - name: gpkgs-storage
+        persistentVolumeClaim:
+          claimName: {{ .Values.storage.gpkgsPvc.name }} 
       containers:
         - name: {{ $releaseName }}-{{ $chartName }}-deployment
           {{- with .Values.image }}
@@ -67,7 +70,7 @@ spec:
             - name: internal-storage
               mountPath: {{ .Values.env.tilesDirectoryPath }}
               subPath: tiles 
-            - name: internal-storage 
+            - name: gpkgs-storage
               mountPath: {{ .Values.env.gpkg.path }} 
               subPath: gpkgs
           {{- if .Values.resources.enabled }}
