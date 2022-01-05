@@ -11,11 +11,11 @@ COPY . .
 RUN npm run build
 
 FROM osgeo/gdal:ubuntu-small-3.3.0
-ARG NODE_INSTALL_VESION
+ARG NODE_INSTALL_VERSION
 RUN apt-get update
 RUN apt-get install -y sqlite3 libsqlite3-dev
 # Install Node v12.x
-RUN curl -fsSL https://deb.nodesource.com/setup_$NODE_INSTALL_VESION.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_$NODE_INSTALL_VERSION.x | bash - \
  && apt-get install -y nodejs
 RUN apt-get install -y dumb-init
 
