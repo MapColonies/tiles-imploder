@@ -24,7 +24,6 @@ export const features: Feature<Polygon> = {
 export const mockTile = { x: 1, y: 1, z: 2, tileData: Buffer.alloc(10) };
 export const mockTiles: Tile[] = [mockTile, mockTile, mockTile];
 
-export const mockPath = '/etc/gpkg.gpkg';
 export const mockBBox: BBox = [0, 0, 1, 1];
 export const mockZoomLevel = 18;
 

@@ -26,15 +26,14 @@ export class TaskHandler {
   }
 
   public async run(input: IInput): Promise<void> {
-    const gpkgFullPath = this.getGPKGPath(input.packageName);
-
     const intersection = intersect(input.footprint, input.bbox);
     const intersectionBbox: BBox = polygonToBBox(intersection);
 
-    const db = new Gpkg(gpkgFullPath, intersectionBbox, input.zoomLevel, input.packageName);
-
     this.logger.info(`Creating new GPKG ${JSON.stringify(input)}`);
+    const db = new Gpkg(intersectionBbox, input.zoomLevel, input.packageName);
+
     const worker = new Worker(db);
+    const gpkgFullPath = this.getGPKGPath(input.packageName);
 
     this.logger.info(`Updating DB extents ${JSON.stringify(input)}`);
     worker.updateExtent(intersectionBbox, input.zoomLevel);
@@ -60,7 +59,7 @@ export class TaskHandler {
         fileSize = await this.getFileSize(gpkgFullPath);
       }
 
-      const fileUri = `${this.downloadServerUrl}/${input.packageName}.gpkg`;
+      const fileUri = `${this.downloadServerUrl}/${input.packageName}`;
       const callbackParams: ICallbackResponse = {
         fileUri,
         expirationTime: expirationDate,
@@ -98,7 +97,7 @@ export class TaskHandler {
   }
 
   private getGPKGPath(packageName: string): string {
-    const gpkgFullPath = `${this.gpkgConfig.path}/${packageName}.gpkg`;
+    const gpkgFullPath = `${this.gpkgConfig.path}/${packageName}`;
     return gpkgFullPath;
   }
 }

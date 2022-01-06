@@ -37,7 +37,7 @@ export class Worker {
     const resamplingMethod = this.config.get<string>('gpkg.resampling');
 
     const overviews = this.calculateOverviews(bbox, zoomLevel);
-    const command = `gdaladdo  -r ${resamplingMethod} ${this.db.path} ${overviews.join(' ')}`;
+    const command = `gdaladdo  -r ${resamplingMethod} ${this.db.gpkgFullPath} ${overviews.join(' ')}`;
 
     this.logger.info(`Building overviews with command: ${command}`);
     const { stdout, stderr } = await promiseExec(command);
