@@ -1,8 +1,7 @@
 import { execSync } from 'child_process';
-import { join as pathJoin } from 'path';
 import Database, { Database as SQLiteDB } from 'better-sqlite3';
 import { Logger } from '@map-colonies/js-logger';
-import { container, injectable } from 'tsyringe';
+import { container } from 'tsyringe';
 import { IConfig } from 'config';
 import { BBox } from '@turf/helpers';
 import { Services } from '../common/constants';
@@ -10,7 +9,6 @@ import { IGpkgConfig } from '../common/interfaces/interfaces';
 import { gpkgSize, snapBBoxToTileGrid } from '../common/utils';
 import { Tile } from '../tiles/tile';
 
-@injectable()
 export class Gpkg {
   public readonly gpkgFullPath: string;
   private readonly packageNameWithoutExtension: string;
@@ -22,15 +20,15 @@ export class Gpkg {
   private readonly packageName: string;
   private readonly gpkgConfig: IGpkgConfig;
 
-  public constructor(extent: BBox, zoomLevel: number, packageName: string) {
+  public constructor(extent: BBox, zoomLevel: number, packageName: string, gpkgFullPath: string) {
     this.logger = container.resolve(Services.LOGGER);
     this.config = container.resolve(Services.CONFIG);
     this.gpkgConfig = this.config.get<IGpkgConfig>('gpkg');
     this.extent = extent;
     this.maxZoomLevel = zoomLevel;
     this.packageName = packageName;
+    this.gpkgFullPath = gpkgFullPath;
     this.packageNameWithoutExtension = this.packageName.substring(0, this.packageName.indexOf('.'));
-    this.gpkgFullPath = pathJoin(this.gpkgConfig.path, packageName);
     this.create();
     this.db = new Database(this.gpkgFullPath, { fileMustExist: true });
   }

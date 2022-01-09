@@ -26,6 +26,7 @@ export const mockTiles: Tile[] = [mockTile, mockTile, mockTile];
 
 export const mockBBox: BBox = [0, 0, 1, 1];
 export const mockZoomLevel = 18;
+export const mockFullPath = '/gpkgs/db.gpkg';
 
 export const geohashString = 'gbsuv7z';
 export const expectedDecodedGeohash = {

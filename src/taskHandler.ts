@@ -1,4 +1,5 @@
 import { promises as fsPromise } from 'fs';
+import { join as pathJoin } from 'path';
 import { Logger } from '@map-colonies/js-logger';
 import { IConfig } from 'config';
 import { inject, singleton } from 'tsyringe';
@@ -28,15 +29,16 @@ export class TaskHandler {
   public async run(input: IInput): Promise<void> {
     const intersection = intersect(input.footprint, input.bbox);
     const intersectionBbox: BBox = polygonToBBox(intersection);
+    const gpkgFullPath = this.getPackageFullPath(input.packageName);
 
     this.logger.info(`Creating new GPKG ${JSON.stringify(input)}`);
-    const db = new Gpkg(intersectionBbox, input.zoomLevel, input.packageName);
+    const db = new Gpkg(intersectionBbox, input.zoomLevel, input.packageName, gpkgFullPath);
 
     const worker = new Worker(db);
-    const gpkgFullPath = this.getGPKGPath(input.packageName);
 
     this.logger.info(`Updating DB extents ${JSON.stringify(input)}`);
     worker.updateExtent(intersectionBbox, input.zoomLevel);
+
     this.logger.info(`Populating ${gpkgFullPath} with bbox ${JSON.stringify(input.bbox)} until zoom level ${input.zoomLevel}`);
     await worker.populate(intersection, input.zoomLevel, input.tilesPath);
 
@@ -52,7 +54,7 @@ export class TaskHandler {
     errorReason?: string
   ): Promise<ICallbackResponse | undefined> {
     try {
-      const gpkgFullPath = this.getGPKGPath(input.packageName);
+      const gpkgFullPath = this.getPackageFullPath(input.packageName);
       const success = errorReason === undefined;
       let fileSize = 0;
       if (success) {
@@ -96,8 +98,8 @@ export class TaskHandler {
     return Math.trunc(fileSizeInBytes); // Make sure we return an Integer
   }
 
-  private getGPKGPath(packageName: string): string {
-    const gpkgFullPath = `${this.gpkgConfig.path}/${packageName}`;
+  private getPackageFullPath(packageName: string): string {
+    const gpkgFullPath = pathJoin(this.gpkgConfig.path, packageName);
     return gpkgFullPath;
   }
 }

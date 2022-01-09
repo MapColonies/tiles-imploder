@@ -30,3 +30,5 @@ export enum JobStatus {
   COMPLETED = 'Completed',
   EXPIRED = 'Expired',
 }
+
+export const GPKG_EXTENSION = 'gpkg';
