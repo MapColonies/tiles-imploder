@@ -83,7 +83,7 @@ export class TaskManager {
       reason,
       percentage: isSuccess ? FULL_PRECENTAGE : undefined,
       expirationDate,
-      parameters: { ...jobData.parameters, callbackParams },
+      parameters: { ...jobData.parameters, packageName: input.packageName, callbackParams },
     };
 
     this.logger.info(`Update Job status to success=${String(isSuccess)} jobId=${input.jobId}`);
