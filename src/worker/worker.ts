@@ -3,7 +3,7 @@ import { exec } from 'child_process';
 import { promises as fsPromise } from 'fs';
 import { BBox, Feature, MultiPolygon, Polygon } from '@turf/helpers';
 import { Logger } from '@map-colonies/js-logger';
-import { container, injectable } from 'tsyringe';
+import { container } from 'tsyringe';
 import { IConfig } from 'config';
 import { ITileRange, TileRanger } from '@map-colonies/mc-utils';
 import { Gpkg } from '../gpkg/gpkg';
@@ -11,7 +11,6 @@ import { Services } from '../common/constants';
 import { Tile } from '../tiles/tile';
 import { getPixelResolution, snapBBoxToTileGrid, tilesCountPerZoom } from '../common/utils';
 
-@injectable()
 export class Worker {
   private readonly logger: Logger;
   private readonly config: IConfig;
@@ -37,7 +36,7 @@ export class Worker {
     const resamplingMethod = this.config.get<string>('gpkg.resampling');
 
     const overviews = this.calculateOverviews(bbox, zoomLevel);
-    const command = `gdaladdo  -r ${resamplingMethod} ${this.db.path} ${overviews.join(' ')}`;
+    const command = `gdaladdo  -r ${resamplingMethod} ${this.db.gpkgFullPath} ${overviews.join(' ')}`;
 
     this.logger.info(`Building overviews with command: ${command}`);
     const { stdout, stderr } = await promiseExec(command);

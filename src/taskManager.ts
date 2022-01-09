@@ -2,9 +2,11 @@ import { join } from 'path';
 import { inject, singleton } from 'tsyringe';
 import { Logger } from '@map-colonies/js-logger';
 import { IUpdateJobBody, OperationStatus } from '@map-colonies/mc-priority-queue';
+import { BBox } from '@turf/helpers';
+import turfBbox from '@turf/bbox';
 import { IConfig, IInput, IJobParameters, ITaskParameters } from './common/interfaces/interfaces';
 import { TaskHandler } from './taskHandler';
-import { FULL_PRECENTAGE, Services } from './common/constants';
+import { FULL_PRECENTAGE, GPKG_EXTENSION, Services } from './common/constants';
 import { QueueClient } from './clients/queueClient';
 import { JobManagerClient } from './clients/jobManagerClient';
 
@@ -32,6 +34,7 @@ export class TaskManager {
     if (data) {
       const { attempts, id: taskId, parameters } = data;
       const jobId = data.jobId as string;
+      const packageBbox = parameters.bbox === true ? turfBbox(parameters.footprint.bbox) : parameters.bbox;
 
       const input: IInput = {
         jobId: jobId,
@@ -39,7 +42,7 @@ export class TaskManager {
         bbox: parameters.bbox,
         zoomLevel: parameters.zoomLevel,
         tilesPath: join(this.tilesDirectoryPath, parameters.tilesPath),
-        packageName: parameters.packageName,
+        packageName: this.generatePackageName(parameters.dbId, parameters.zoomLevel, packageBbox),
         callbackURLs: parameters.callbackURLs,
         dbId: parameters.dbId,
       };
@@ -80,10 +83,16 @@ export class TaskManager {
       reason,
       percentage: isSuccess ? FULL_PRECENTAGE : undefined,
       expirationDate,
-      parameters: { ...jobData.parameters, callbackParams },
+      parameters: { ...jobData.parameters, packageName: input.packageName, callbackParams },
     };
 
     this.logger.info(`Update Job status to success=${String(isSuccess)} jobId=${input.jobId}`);
     await this.jobManagerClient.updateJob(input.jobId, updateJobParams);
+  }
+
+  private generatePackageName(cswId: string, zoomLevel: number, bbox: BBox): string {
+    const numberOfDecimals = 5;
+    const bboxToString = bbox.map((val) => String(val.toFixed(numberOfDecimals)).replace('.', '_')).join('');
+    return `gm_${cswId.replace(/-/g, '_')}_${zoomLevel}_${bboxToString}.${GPKG_EXTENSION}`;
   }
 }
