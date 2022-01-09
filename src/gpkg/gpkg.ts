@@ -47,7 +47,7 @@ export class Gpkg {
   }
 
   public runStatement(sql: string, params: unknown): void {
-    this.logger.info(`Executing query ${sql} with params: ${JSON.stringify(params)} on DB ${this.gpkgFullPath}`);
+    this.logger.debug(`Executing query ${sql} with params: ${JSON.stringify(params)} on DB ${this.gpkgFullPath}`);
     const statement = this.db.prepare(sql);
     statement.run(params);
   }
