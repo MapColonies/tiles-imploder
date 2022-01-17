@@ -36,6 +36,9 @@ spec:
         - name: {{ $cloudProviderImagePullSecretName | quote }}
     {{- end }}
       volumes:
+      - name: intermediate-storage
+        emptyDir:
+          sizeLimit: {{ .Values.storage.intermediateStorage.sizeLimit }}
       - name: internal-storage
         persistentVolumeClaim:
           claimName: {{ .Values.storage.internalPvc.name }} 
@@ -67,11 +70,13 @@ spec:
               path: /liveness
               port: http
           volumeMounts:
+            - name: intermediate-storage
+              mountPath: {{ .Values.env.gpkg.intermediatePath }}
             - name: internal-storage
               mountPath: {{ .Values.env.tilesDirectoryPath }}
               subPath: tiles 
             - name: gpkgs-storage
-              mountPath: {{ .Values.env.gpkg.path }} 
+              mountPath: {{ .Values.env.gpkg.finalPath }} 
               subPath: gpkgs
           {{- if .Values.resources.enabled }}
           resources:

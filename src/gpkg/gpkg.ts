@@ -1,4 +1,6 @@
+import { promises as fsPromise } from 'fs';
 import { execSync } from 'child_process';
+import { join as pathJoin } from 'path';
 import Database, { Database as SQLiteDB } from 'better-sqlite3';
 import { Logger } from '@map-colonies/js-logger';
 import { container } from 'tsyringe';
@@ -10,27 +12,27 @@ import { gpkgSize, snapBBoxToTileGrid } from '../common/utils';
 import { Tile } from '../tiles/tile';
 
 export class Gpkg {
-  public readonly gpkgFullPath: string;
+  public readonly gpkgConfig: IGpkgConfig;
+  public readonly packageName: string;
+  private fullPath: string;
   private readonly packageNameWithoutExtension: string;
   private readonly logger: Logger;
   private readonly db: SQLiteDB;
   private readonly config: IConfig;
   private readonly extent: BBox;
   private readonly maxZoomLevel: number;
-  private readonly packageName: string;
-  private readonly gpkgConfig: IGpkgConfig;
 
-  public constructor(extent: BBox, zoomLevel: number, packageName: string, gpkgFullPath: string) {
+  public constructor(extent: BBox, zoomLevel: number, packageName: string) {
     this.logger = container.resolve(Services.LOGGER);
     this.config = container.resolve(Services.CONFIG);
     this.gpkgConfig = this.config.get<IGpkgConfig>('gpkg');
     this.extent = extent;
     this.maxZoomLevel = zoomLevel;
     this.packageName = packageName;
-    this.gpkgFullPath = gpkgFullPath;
+    this.fullPath = pathJoin(this.gpkgConfig.intermediatePath, this.packageName);
     this.packageNameWithoutExtension = this.packageName.substring(0, this.packageName.indexOf('.'));
     this.create();
-    this.db = new Database(this.gpkgFullPath, { fileMustExist: true });
+    this.db = new Database(this.fullPath, { fileMustExist: true });
   }
 
   public insertTiles(tiles: Tile[]): void {
@@ -47,19 +49,32 @@ export class Gpkg {
   }
 
   public runStatement(sql: string, params: unknown): void {
-    this.logger.debug(`Executing query ${sql} with params: ${JSON.stringify(params)} on DB ${this.gpkgFullPath}`);
+    this.logger.debug(`Executing query ${sql} with params: ${JSON.stringify(params)} on DB ${this.fullPath}`);
     const statement = this.db.prepare(sql);
     statement.run(params);
   }
 
   public commit(): void {
-    this.logger.info(`Commiting to DB ${this.gpkgFullPath}`);
+    this.logger.info(`Commiting to DB ${this.fullPath}`);
     this.db.exec('COMMIT');
   }
 
-  public close(): void {
-    this.logger.info(`Closing GPKG in path ${this.gpkgFullPath}`);
+  public closeConnection(): void {
+    this.logger.info(`Closing connection to GPKG in path ${this.fullPath}`);
     this.db.close();
+  }
+
+  public async getFileSize(): Promise<number> {
+    const fileSizeInBytes = (await fsPromise.stat(this.fullPath)).size;
+    return Math.trunc(fileSizeInBytes); // Make sure we return an Integer
+  }
+
+  public setFullPath(path: string): void {
+    this.fullPath = path;
+  }
+
+  public getFullPath(): string {
+    return this.fullPath;
   }
 
   private create(): void {
@@ -70,9 +85,9 @@ export class Gpkg {
     -co TILING_SCHEME=${this.gpkgConfig.tilingScheme} \
     -co RASTER_TABLE=${this.packageNameWithoutExtension} \
     -co RASTER_IDENTIFIER=${this.packageNameWithoutExtension} \
-    -co ADD_GPKG_OGR_CONTENTS=NO ${this.gpkgFullPath}`;
+    -co ADD_GPKG_OGR_CONTENTS=NO ${this.fullPath}`;
 
-    this.logger.info(`Creating a new GPKG with the command: ${command}`);
+    this.logger.debug(`Creating a new GPKG with the command: ${command}`);
     execSync(command);
   }
 }

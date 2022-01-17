@@ -54,14 +54,9 @@
     "__name": "MAX_ATTEMPTS",
     "__format": "number"
   },
-  "geohash": {
-    "precision": {
-      "__name": "GEOHASH_PRECISION",
-      "__format": "number"
-    }
-  },
   "gpkg": {
-    "path": "GPKG_PATH",
+    "intermediatePath": "GPKG_INTERMEDIATE_PATH",
+    "finalPath": "GPKG_FINAL_PATH",
     "resampling": "GPKG_RESAMPLING",
     "tilingScheme": "GPKG_TILING_SCHEME"
   },

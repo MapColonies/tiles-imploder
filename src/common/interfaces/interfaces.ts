@@ -22,7 +22,8 @@ export interface IInput {
 }
 
 export interface IGpkgConfig {
-  path: string;
+  intermediatePath: string;
+  finalPath: string;
   resampling: string;
   tilingScheme: string;
 }

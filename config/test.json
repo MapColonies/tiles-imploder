@@ -21,11 +21,9 @@
   },
   "tilesDirectoryPath": "/etc/tiles",
   "downloadServerUrl": "http://localhost:8084/downloads",
-  "geohash": {
-    "precision": 7
-  },
   "gpkg": {
-    "path": "/etc",
+    "intermediatePath": "/etc",
+    "finalPath": "/tmp",
     "resampling": "bilinear",
     "tilingScheme": "InspireCRS84Quad"
   },

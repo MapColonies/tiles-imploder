@@ -31,11 +31,9 @@
     "expirationDate": 30
   },
   "maxAttempts": 3,
-  "geohash": {
-    "precision": 7
-  },
   "gpkg": {
-    "path": "/path/to/gpkg",
+    "intermediatePath": "/path/to/gpkg",
+    "finalPath": "/path/to/gpkg",
     "resampling": "bilinear",
     "tilingScheme": "InspireCRS84Quad"
   },

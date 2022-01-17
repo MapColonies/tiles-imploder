@@ -1,6 +1,7 @@
 import { promisify } from 'util';
 import { exec } from 'child_process';
 import { promises as fsPromise } from 'fs';
+import { join as pathJoin } from 'path';
 import { BBox, Feature, MultiPolygon, Polygon } from '@turf/helpers';
 import { Logger } from '@map-colonies/js-logger';
 import { container } from 'tsyringe';
@@ -32,13 +33,12 @@ export class Worker {
 
   public async buildOverviews(bbox: BBox, zoomLevel: number): Promise<void> {
     const promiseExec = promisify(exec);
-
-    const resamplingMethod = this.config.get<string>('gpkg.resampling');
+    const fullPath = this.db.getFullPath();
 
     const overviews = this.calculateOverviews(bbox, zoomLevel);
-    const command = `gdaladdo  -r ${resamplingMethod} ${this.db.gpkgFullPath} ${overviews.join(' ')}`;
+    const command = `gdaladdo  -r ${this.db.gpkgConfig.resampling} ${fullPath} ${overviews.join(' ')}`;
 
-    this.logger.info(`Building overviews with command: ${command}`);
+    this.logger.debug(`Building overviews with command: ${command}`);
     const { stdout, stderr } = await promiseExec(command);
 
     if (stderr) {
@@ -54,6 +54,18 @@ export class Worker {
 
     const sql = `UPDATE gpkg_contents SET min_x = ?, min_y = ?, max_x = ?, max_y = ?`;
     this.db.runStatement(sql, extent);
+  }
+
+  public async copyFileToMount(): Promise<void> {
+    const fullPath = this.db.getFullPath();
+
+    const destionation = pathJoin(this.db.gpkgConfig.finalPath, this.db.packageName);
+    await fsPromise.copyFile(fullPath, destionation);
+
+    this.logger.info(`Deleting file in path ${fullPath}`);
+    await fsPromise.unlink(fullPath);
+
+    this.db.setFullPath(destionation);
   }
 
   private async handleBatch(tileGenerator: AsyncGenerator<Tile>): Promise<void> {
