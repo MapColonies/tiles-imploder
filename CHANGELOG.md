@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/MapColonies/tiles-imploder/compare/v1.3.0...v1.4.0) (2022-01-18)
+
+
+### Features
+
+* add intermediate storage for gpkg creation ([#21](https://github.com/MapColonies/tiles-imploder/issues/21)) ([e81978f](https://github.com/MapColonies/tiles-imploder/commit/e81978fc9ca0d86163d2f9bca11bcf3d2fd7a307))
+
 ## [1.3.0](https://github.com/MapColonies/tiles-imploder/compare/v1.1.1...v1.3.0) (2022-01-10)
 
 
