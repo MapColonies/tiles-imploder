@@ -4,7 +4,6 @@ import { BBox } from '@turf/helpers';
 import { Services } from '../../../src/common/constants';
 import { Gpkg } from '../../../src/gpkg/gpkg';
 import { Worker } from '../../../src/worker/worker';
-import * as Utils from '../../../src/common/utils';
 import { features } from '../mockData';
 
 describe('worker', () => {
@@ -26,13 +25,11 @@ describe('worker', () => {
     };
 
     const worker = new Worker(gpkg as unknown as Gpkg);
-    const spy = jest.spyOn(Utils, 'snapBBoxToTileGrid');
 
     const mockBBox: BBox = [0, 0, 1, 1];
     const mockZoomLevel = 12;
     worker.updateExtent(mockBBox, mockZoomLevel);
 
-    expect(spy).toHaveBeenCalled();
     expect(gpkg.runStatement).toHaveBeenCalled();
   });
 

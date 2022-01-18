@@ -28,6 +28,8 @@ storage:
   gpkgsPvc:
     enabled: false
     name: gpkgs-storage
+  intermediateStorage:
+    sizeLimit: '10Gi'
 
 image:
   repository: tiles-imploder
@@ -58,11 +60,10 @@ env:
     taskType: "rasterTilesExporter"
     expirationDate: 30
   maxAttempts: 3
-  geohash: 
-    precision: 7
   gpkg:
-    path: "/gpkgStorage"
-    resampling: "bilinear"
+    intermediatePath: "/intermediateStorage"
+    finalPath: "/gpksStorage"
+    resampling: "average"
     tilingScheme: "InspireCRS84Quad"
   batchSize: 15
   httpRetry: 

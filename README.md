@@ -12,9 +12,9 @@ Build an image with the provided `Dockerfile`, then run it.
 # Environment Variables
 **Service Specific**
 * TILES_DIR_PATH - the directory on the filesystem where tiles are located
-* GEOHASH_PRECISION - the precision of the geohash.
 * GPKG_NAME - the name of the database.
-* GPKG_PATH - full path of the directory that holds the gpkg.
+* GPKG_INTERMEDIATE_PATH - path to where gpkg is stored before it is copied to GPKG_FINAL_PATH.
+* GPKG_FINAL_PATH - full path of the directory that holds the gpkg.
 * GPKG_TABLE_NAME - the table name of the where tiles are stored.
 * GPKG_RESAMPLING - resampling method for building overviews. 
 * BATCH_SIZE - Number of records to insert to the `.gpkg` in one transaction.

@@ -13,14 +13,6 @@ export enum Services {
   QUEUE_CONFIG = 'IQueueConfig',
 }
 
-export const MIN_PIXEL_RESOLUTION = 0.703125;
-export const TILE_AXIS_SIZE = 256;
-export const COORDINATE_SYSTEM = {
-  maxLat: 90,
-  minLat: -90,
-  maxLon: 180,
-  minLon: -180,
-};
 export const FULL_PRECENTAGE = 100;
 
 export enum JobStatus {

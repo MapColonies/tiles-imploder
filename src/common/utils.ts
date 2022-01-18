@@ -2,76 +2,20 @@ import turfIntersect from '@turf/intersect';
 import turfBBoxPolygon from '@turf/bbox-polygon';
 import turfLineStringToPolygon from '@turf/line-to-polygon';
 import { Geometry, Feature, Polygon, MultiPolygon, LineString, feature as turfFeature, BBox } from '@turf/helpers';
-import { Tile } from '../tiles/tile';
-import { COORDINATE_SYSTEM, TILE_AXIS_SIZE } from './constants';
-import { Coordinate } from './interfaces/interfaces';
-
-export function getTileResolution(zoomLevel: number): number {
-  return COORDINATE_SYSTEM.maxLon / (1 << zoomLevel);
-}
-
-export function getPixelResolution(zoomLevel: number): number {
-  const tileRes = getTileResolution(zoomLevel);
-  return tileRes / TILE_AXIS_SIZE;
-}
-
-export function degreesPerTile(zoomLevel: number): number {
-  const latRange = 180;
-  return latRange / (1 << zoomLevel);
-}
+import { degreesPerPixel, snapBBoxToTileGrid } from '@map-colonies/mc-utils';
 
 export function tilesCountPerZoom(zoomLevel: number): number {
   return (1 << zoomLevel) - 1;
 }
 
-export function snapBBoxToTileGrid(bbox: BBox, zoomLevel: number): BBox {
-  const tileGridBBox: number[] = [];
-  const minLon = Math.min(bbox[0], bbox[2]);
-  const minLat = Math.min(bbox[1], bbox[3]);
-  const maxLon = Math.max(bbox[0], bbox[2]);
-  const maxLat = Math.max(bbox[1], bbox[3]);
-  const tileRes = degreesPerTile(zoomLevel);
-  tileGridBBox[0] = snapMinCordToTileGrid(minLon, tileRes);
-  tileGridBBox[1] = snapMinCordToTileGrid(minLat, tileRes);
-  tileGridBBox[2] = snapMinCordToTileGrid(maxLon, tileRes);
-  if (tileGridBBox[2] != maxLon) {
-    tileGridBBox[2] += tileRes;
-  }
-  tileGridBBox[3] = snapMinCordToTileGrid(maxLat, tileRes);
-  if (tileGridBBox[3] != maxLat) {
-    tileGridBBox[3] += tileRes;
-  }
-  return tileGridBBox as BBox;
-}
-
-export function snapMinCordToTileGrid(cord: number, tileRes: number): number {
-  return cord - Math.abs(cord % tileRes);
-}
-
 export function gpkgSize(bbox: BBox, zoomLevel: number): [number, number] {
-  const extent = snapBBoxToTileGrid(bbox, zoomLevel);
-  const pixelRes = getPixelResolution(zoomLevel);
+  const extent = snapBBoxToTileGrid(bbox as [number, number, number, number], zoomLevel);
+  const pixelRes = degreesPerPixel(zoomLevel);
 
   const outsizeX = (extent[2] - extent[0]) / pixelRes;
   const outsizeY = (extent[3] - extent[1]) / pixelRes;
 
   return [outsizeX, outsizeY];
-}
-
-export function toBBox(minTile: Tile, maxTile: Tile): [Coordinate, Coordinate] {
-  if (minTile.z !== maxTile.z) {
-    throw new Error(`Could not calcualte bbox from tiles due to not matching zoom levels`);
-  }
-  const res = getTileResolution(minTile.z);
-  const minLon = minTile.x * res - COORDINATE_SYSTEM.maxLon;
-  const minLat = minTile.y * res - COORDINATE_SYSTEM.maxLat;
-  const maxLon = (maxTile.x + 1) * res - COORDINATE_SYSTEM.maxLon;
-  const maxLat = (maxTile.y + 1) * res - COORDINATE_SYSTEM.maxLat;
-
-  return [
-    { lon: minLon, lat: minLat },
-    { lon: maxLon, lat: maxLat },
-  ];
 }
 
 export function intersect(footprint: Geometry, bbox: BBox | true): Feature<Polygon | MultiPolygon> {
