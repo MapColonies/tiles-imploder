@@ -34,7 +34,7 @@
   "gpkg": {
     "intermediatePath": "/path/to/gpkg",
     "finalPath": "/path/to/gpkg",
-    "resampling": "bilinear",
+    "resampling": "average",
     "tilingScheme": "InspireCRS84Quad"
   },
   "batchSize": 15,

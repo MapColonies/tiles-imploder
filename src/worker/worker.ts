@@ -56,15 +56,16 @@ export class Worker {
     this.db.runStatement(sql, extent);
   }
 
-  public async copyFileToMount(): Promise<void> {
+  public async copyToFinalMount(): Promise<void> {
     const fullPath = this.db.getFullPath();
-
     const destionation = pathJoin(this.db.gpkgConfig.finalPath, this.db.packageName);
     await fsPromise.copyFile(fullPath, destionation);
+  }
 
-    this.logger.info(`Deleting file in path ${fullPath}`);
+  public async deleteFromIntermediateMount(): Promise<void> {
+    const fullPath = this.db.getFullPath();
+    const destionation = pathJoin(this.db.gpkgConfig.finalPath, this.db.packageName);
     await fsPromise.unlink(fullPath);
-
     this.db.setFullPath(destionation);
   }
 

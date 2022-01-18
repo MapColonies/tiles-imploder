@@ -24,7 +24,7 @@
   "gpkg": {
     "intermediatePath": "/etc",
     "finalPath": "/tmp",
-    "resampling": "bilinear",
+    "resampling": "average",
     "tilingScheme": "InspireCRS84Quad"
   },
   "batchSize": 15

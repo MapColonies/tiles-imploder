@@ -63,7 +63,7 @@ env:
   gpkg:
     intermediatePath: "/intermediateStorage"
     finalPath: "/gpksStorage"
-    resampling: "bilinear"
+    resampling: "average"
     tilingScheme: "InspireCRS84Quad"
   batchSize: 15
   httpRetry: 

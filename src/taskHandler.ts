@@ -14,6 +14,7 @@ import { CallbackClient } from './clients/callbackClient';
 export class TaskHandler {
   private readonly downloadServerUrl: string;
   private gpkg?: Gpkg;
+  private worker?: Worker;
 
   public constructor(
     @inject(Services.LOGGER) private readonly logger: Logger,
@@ -29,22 +30,25 @@ export class TaskHandler {
 
     this.logger.info(`Creating new GPKG ${JSON.stringify(input)}`);
     this.gpkg = new Gpkg(intersectionBbox, input.zoomLevel, input.packageName);
-    const worker = new Worker(this.gpkg);
+    this.worker = new Worker(this.gpkg);
     const gpkgFullPath = this.gpkg.getFullPath();
 
     this.logger.info(`Updating DB extents for GPKG in path ${gpkgFullPath}`);
-    worker.updateExtent(intersectionBbox, input.zoomLevel);
+    this.worker.updateExtent(intersectionBbox, input.zoomLevel);
 
     this.logger.info(`Populating ${gpkgFullPath} with bbox ${JSON.stringify(input.bbox)} until zoom level ${input.zoomLevel}`);
-    await worker.populate(intersection, input.zoomLevel, input.tilesPath);
+    await this.worker.populate(intersection, input.zoomLevel, input.tilesPath);
 
     this.gpkg.closeConnection();
 
     this.logger.info(`Building overviews in ${gpkgFullPath}`);
-    await worker.buildOverviews(intersectionBbox, input.zoomLevel);
+    await this.worker.buildOverviews(intersectionBbox, input.zoomLevel);
 
-    this.logger.info(`Copying gpkg file from ${gpkgFullPath} to folder ${this.gpkg.gpkgConfig.intermediatePath}`);
-    await worker.copyFileToMount();
+    this.logger.info(`Copying gpkg file from ${gpkgFullPath} to folder ${this.gpkg.gpkgConfig.finalPath}`);
+    await this.worker.copyToFinalMount();
+
+    this.logger.info(`Deleting file in path ${gpkgFullPath}`);
+    await this.worker.deleteFromIntermediateMount();
   }
 
   public async sendCallbacks(
