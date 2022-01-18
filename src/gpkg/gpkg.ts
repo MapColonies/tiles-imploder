@@ -6,9 +6,10 @@ import { Logger } from '@map-colonies/js-logger';
 import { container } from 'tsyringe';
 import { IConfig } from 'config';
 import { BBox } from '@turf/helpers';
+import { snapBBoxToTileGrid } from '@map-colonies/mc-utils';
 import { Services } from '../common/constants';
 import { IGpkgConfig } from '../common/interfaces/interfaces';
-import { gpkgSize, snapBBoxToTileGrid } from '../common/utils';
+import { gpkgSize } from '../common/utils';
 import { Tile } from '../tiles/tile';
 
 export class Gpkg {
@@ -78,7 +79,7 @@ export class Gpkg {
   }
 
   private create(): void {
-    const tileGridBBox = snapBBoxToTileGrid(this.extent, this.maxZoomLevel);
+    const tileGridBBox = snapBBoxToTileGrid(this.extent as [number, number, number, number], this.maxZoomLevel);
     const [outsizeX, outsizeY] = gpkgSize(this.extent, this.maxZoomLevel);
 
     const command = `gdal_create -outsize ${outsizeX} ${outsizeY} -a_ullr ${tileGridBBox[0]} ${tileGridBBox[3]} ${tileGridBBox[2]} ${tileGridBBox[1]} \

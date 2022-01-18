@@ -92,7 +92,7 @@ export class TaskManager {
 
   private generatePackageName(cswId: string, zoomLevel: number, bbox: BBox): string {
     const numberOfDecimals = 5;
-    const bboxToString = bbox.map((val) => String(val.toFixed(numberOfDecimals)).replace('.', '_')).join('');
+    const bboxToString = bbox.map((val) => String(val.toFixed(numberOfDecimals)).replace('.', '_').replace(/-/g, 'm')).join('');
     return `gm_${cswId.replace(/-/g, '_')}_${zoomLevel}_${bboxToString}.${GPKG_EXTENSION}`;
   }
 }

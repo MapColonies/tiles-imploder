@@ -6,11 +6,11 @@ import { BBox, Feature, MultiPolygon, Polygon } from '@turf/helpers';
 import { Logger } from '@map-colonies/js-logger';
 import { container } from 'tsyringe';
 import { IConfig } from 'config';
-import { ITileRange, TileRanger } from '@map-colonies/mc-utils';
+import { degreesPerPixel, ITileRange, snapBBoxToTileGrid, TileRanger } from '@map-colonies/mc-utils';
 import { Gpkg } from '../gpkg/gpkg';
 import { Services } from '../common/constants';
 import { Tile } from '../tiles/tile';
-import { getPixelResolution, snapBBoxToTileGrid, tilesCountPerZoom } from '../common/utils';
+import { tilesCountPerZoom } from '../common/utils';
 
 export class Worker {
   private readonly logger: Logger;
@@ -50,7 +50,7 @@ export class Worker {
   }
 
   public updateExtent(bbox: BBox, zoomLevel: number): void {
-    const extent = snapBBoxToTileGrid(bbox, zoomLevel);
+    const extent = snapBBoxToTileGrid(bbox as [number, number, number, number], zoomLevel);
 
     const sql = `UPDATE gpkg_contents SET min_x = ?, min_y = ?, max_x = ?, max_y = ?`;
     this.db.runStatement(sql, extent);
@@ -90,7 +90,7 @@ export class Worker {
 
     // Overviews are built 1 zoom level before the maximum zoom level
     const maxOverviewZoom = zoomLevel - 1;
-    let pixelSize = getPixelResolution(maxOverviewZoom);
+    let pixelSize = degreesPerPixel(maxOverviewZoom);
     let overviewCounter = maxOverviewZoom;
 
     while (lonDiff >= pixelSize && latDiff >= pixelSize && overviewCounter >= 0) {
