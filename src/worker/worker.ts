@@ -61,9 +61,9 @@ export class Worker {
   }
 
   private async execPromise(command: string): Promise<void> {
-    const promiseExec = promisify(exec);
+    const asyncExec = promisify(exec);
     this.logger.debug(`Executing command: ${command}`);
-    const { stdout, stderr } = await promiseExec(command);
+    const { stdout, stderr } = await asyncExec(command);
 
     if (stderr) {
       throw new Error(stderr);
