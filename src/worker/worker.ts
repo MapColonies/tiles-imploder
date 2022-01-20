@@ -32,21 +32,12 @@ export class Worker {
   }
 
   public async buildOverviews(bbox: BBox, zoomLevel: number): Promise<void> {
-    const promiseExec = promisify(exec);
     const fullPath = this.db.getFullPath();
 
     const overviews = this.calculateOverviews(bbox, zoomLevel);
     const command = `gdaladdo  -r ${this.db.gpkgConfig.resampling} ${fullPath} ${overviews.join(' ')}`;
 
-    this.logger.debug(`Building overviews with command: ${command}`);
-    const { stdout, stderr } = await promiseExec(command);
-
-    if (stderr) {
-      throw new Error(stderr);
-    }
-    if (stdout) {
-      this.logger.info(stdout);
-    }
+    await this.execPromise(command);
   }
 
   public updateExtent(bbox: BBox, zoomLevel: number): void {
@@ -59,7 +50,7 @@ export class Worker {
   public async copyToFinalMount(): Promise<void> {
     const fullPath = this.db.getFullPath();
     const destionation = pathJoin(this.db.gpkgConfig.finalPath, this.db.packageName);
-    await fsPromise.copyFile(fullPath, destionation);
+    await this.execPromise(`cp ${fullPath} ${destionation}`);
   }
 
   public async deleteFromIntermediateMount(): Promise<void> {
@@ -67,6 +58,19 @@ export class Worker {
     const destionation = pathJoin(this.db.gpkgConfig.finalPath, this.db.packageName);
     await fsPromise.unlink(fullPath);
     this.db.setFullPath(destionation);
+  }
+
+  private async execPromise(command: string): Promise<void> {
+    const asyncExec = promisify(exec);
+    this.logger.debug(`Executing command: ${command}`);
+    const { stdout, stderr } = await asyncExec(command);
+
+    if (stderr) {
+      throw new Error(stderr);
+    }
+    if (stdout) {
+      this.logger.info(stdout);
+    }
   }
 
   private async handleBatch(tileGenerator: AsyncGenerator<Tile>): Promise<void> {
