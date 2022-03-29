@@ -20,13 +20,13 @@ data:
   TELEMETRY_METRICS_URL: {{ $metricsUrl }}
   {{ end }}
   TILES_DIR_PATH: {{ .Values.env.tilesDirectoryPath | quote }}
-  QUEUE_JOB_MANAGER_BASE_URL: {{ .Values.env.queue.jobManagerBaseUrl | quote }}
-  QUEUE_HEARTBEAT_MANAGER_BASE_URL: {{ .Values.env.queue.heartbeatManagerBaseUrl | quote }}
+  QUEUE_JOB_MANAGER_BASE_URL: {{ .Values.rasterCommon.serviceUrls.jobManager | quote }}
+  QUEUE_HEARTBEAT_MANAGER_BASE_URL: {{ .Values.rasterCommon.serviceUrls.heartbeatManager | quote }}
   QUEUE_HEARTBEAT_INTERVAL_MS: {{ .Values.env.queue.heartbeatIntervalMs | quote }}
-  QUEUE_JOB_TYPE: {{ .Values.env.queue.jobType | quote }}
-  QUEUE_TASK_TYPE: {{ .Values.env.queue.taskType | quote }}
+  QUEUE_JOB_TYPE: {{ .Values.rasterCommon.jobManagement.exporter.jobType | quote }}
+  QUEUE_TASK_TYPE: {{ .Values.rasterCommon.jobManagement.exporter.taskType | quote }}
   QUEUE_EXPIRATION_DATE: {{ .Values.env.queue.expirationDate | quote}}
-  DOWNLOAD_SERVER_URL: {{ .Values.env.downloadServerUrl | quote }}
+  DOWNLOAD_SERVER_URL: {{ .Values.rasterCommon.serviceUrls.downloadServer | quote }}
   MAX_ATTEMPTS: {{ .Values.env.maxAttempts | quote }}
   GPKG_INTERMEDIATE_PATH: {{ .Values.env.gpkg.intermediatePath | quote }}
   GPKG_FINAL_PATH: {{ .Values.env.gpkg.finalPath | quote }}
