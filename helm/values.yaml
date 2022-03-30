@@ -35,6 +35,7 @@ rasterCommon:
         enabled: true
         name: internal-pvc
         subPath: tiles
+  storageProvider: FS
 
 intermediateStorage:
   enabled: true
