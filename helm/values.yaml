@@ -26,6 +26,7 @@ rasterCommon:
       jobType: tilesExport
       taskType: tilesExport
   storage:
+    gpkgProvider: FS
     fs:
       gpkgsPvc:
         enabled: true
@@ -35,7 +36,6 @@ rasterCommon:
         enabled: true
         name: internal-pvc
         subPath: tiles
-  storageProvider: FS
 
 intermediateStorage:
   enabled: true
