@@ -9,27 +9,37 @@ environment: development
 replicaCount: 1
 initialDelaySeconds: 60
 nodePort: 30030 #for minikube deployment only
+resetOnConfigChange: true
 
 cloudProvider:
   dockerRegistryUrl: my-registry-url.io
   imagePullSecretName: pullSecretName
   flavor: openshift
 
-storage:
-  accessModes: ReadWriteOnce
-  storageSize: 5Gi
-  storageClass: azure-file
-  pv:
-    enabled: false
-    hostPath: /raster/gpkgs
-  internalPvc:
-    enabled: false
-    name: internal-pvc
-  gpkgsPvc:
-    enabled: false
-    name: gpkgs-storage
-  intermediateStorage:
-    sizeLimit: '10Gi'
+rasterCommon:
+  serviceUrls:
+    jobManager: "http://job-manager-raster-dev-discrete-ingestion-db"
+    heartbeatManager: "http://heartbeat-manager-raster-dev-heartbeat-manager"
+    downloadServer: "http://file-download-server-dev-file-download-server"
+  jobManagement:
+    exporter:
+      jobType: tilesExport
+      taskType: tilesExport
+  storage:
+    fs:
+      gpkgsPvc:
+        enabled: true
+        name: gpkgs-storage
+        subPath: gpkgs
+      internalPvc:
+        enabled: true
+        name: internal-pvc
+        subPath: tiles
+  storageProvider: FS
+
+intermediateStorage:
+  enabled: true
+  sizeLimit: '10Gi'
 
 image:
   repository: tiles-imploder
@@ -50,14 +60,9 @@ env:
     enabled: false
     url: http://localhost:55681/v1/metrics
   tilesDirectoryPath: "/tilesStorage"
-  downloadServerUrl: "http://localhost:8084/downloads"
   queue: 
-    jobManagerBaseUrl: "http://localhost:8082"
-    heartbeatManagerBaseUrl: "http://localhost:8083"
     dequeueIntervalMs: 1000
     heartbeatIntervalMs: 300
-    jobType: "rasterTilesExporter"
-    taskType: "rasterTilesExporter"
     expirationDate: 30
   maxAttempts: 3
   gpkg:
@@ -82,7 +87,7 @@ resources:
       memory: 128Mi
 
 route:
-  enabled: true
+  enabled: false
   path: /
 
 ingress:

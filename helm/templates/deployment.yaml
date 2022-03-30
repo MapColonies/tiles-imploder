@@ -3,6 +3,7 @@
 {{- $cloudProviderFlavor := include "tiles-imploder.cloudProviderFlavor" . -}}
 {{- $cloudProviderDockerRegistryUrl := include "tiles-imploder.cloudProviderDockerRegistryUrl" . -}}
 {{- $cloudProviderImagePullSecretName := include "tiles-imploder.cloudProviderImagePullSecretName" . -}}
+{{- $volumesNeeded := or (.Values.rasterCommon.storage.fs.internalPvc.enabled) (.Values.rasterCommon.storage.fs.gpkgsPvc.enabled) (.Values.intermediateStorage.enabled) }}
 
 {{- if .Values.enabled -}}
 apiVersion: apps/v1
@@ -30,21 +31,33 @@ spec:
         release: {{ $releaseName }}
         run: {{ $releaseName }}-{{ $chartName }}
         {{- include "tiles-imploder.selectorLabels" . | nindent 8 }}
+      {{- if .Values.resetOnConfigChange }}
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- end }}        
     spec:
     {{- if $cloudProviderImagePullSecretName }}
       imagePullSecrets:
         - name: {{ $cloudProviderImagePullSecretName | quote }}
     {{- end }}
+    {{- if $volumesNeeded }}
       volumes:
+      {{- if .Values.intermediateStorage.enabled }}
       - name: intermediate-storage
         emptyDir:
-          sizeLimit: {{ .Values.storage.intermediateStorage.sizeLimit }}
+          sizeLimit: {{ .Values.intermediateStorage.sizeLimit }}
+      {{- end }}
+      {{- if .Values.rasterCommon.storage.fs.internalPvc.enabled }}
       - name: internal-storage
         persistentVolumeClaim:
-          claimName: {{ .Values.storage.internalPvc.name }} 
+          claimName: {{ .Values.rasterCommon.storage.fs.internalPvc.name }}
+      {{- end }}
+      {{- if .Values.rasterCommon.storage.fs.gpkgsPvc.enabled }}
       - name: gpkgs-storage
         persistentVolumeClaim:
-          claimName: {{ .Values.storage.gpkgsPvc.name }} 
+          claimName: {{ .Values.rasterCommon.storage.fs.gpkgsPvc.name }}
+      {{- end }}
+    {{- end }}
       containers:
         - name: {{ $releaseName }}-{{ $chartName }}-deployment
           {{- with .Values.image }}
@@ -69,15 +82,23 @@ spec:
             httpGet:
               path: /liveness
               port: http
+          {{- if $volumesNeeded }}              
           volumeMounts:
+            {{- if .Values.intermediateStorage.enabled }}
             - name: intermediate-storage
               mountPath: {{ .Values.env.gpkg.intermediatePath }}
+            {{- end }}
+            {{- if .Values.rasterCommon.storage.fs.internalPvc.enabled }}
             - name: internal-storage
               mountPath: {{ .Values.env.tilesDirectoryPath }}
-              subPath: tiles 
+              subPath: {{ .Values.rasterCommon.storage.fs.internalPvc.subPath }}
+            {{- end }}
+            {{- if .Values.rasterCommon.storage.fs.gpkgsPvc.enabled }}
             - name: gpkgs-storage
-              mountPath: {{ .Values.env.gpkg.finalPath }} 
-              subPath: gpkgs
+              mountPath: {{ .Values.env.gpkg.finalPath }}
+              subPath: {{ .Values.rasterCommon.storage.fs.gpkgsPvc.subPath }}
+            {{- end }}
+          {{- end }}
           {{- if .Values.resources.enabled }}
           resources:
             {{- toYaml .Values.resources.value | nindent 12 }}
