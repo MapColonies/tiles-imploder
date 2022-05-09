@@ -51,9 +51,6 @@ spec:
       - name: internal-storage
         persistentVolumeClaim:
           claimName: {{ .Values.rasterCommon.storage.fs.internalPvc.name }}
-      - name: gpkgs-storage
-        persistentVolumeClaim:
-          claimName: {{ .Values.rasterCommon.storage.fs.internalPvc.name }}
       {{- end }}
     {{- end }}
       containers:
@@ -90,7 +87,7 @@ spec:
             - name: internal-storage
               mountPath: {{ .Values.env.tilesDirectoryPath }}
               subPath: {{ .Values.rasterCommon.storage.fs.internalPvc.tilesSubPath }}
-            - name: gpkgs-storage
+            - name: internal-storage
               mountPath: {{ .Values.env.gpkg.finalPath }}
               subPath: {{ .Values.rasterCommon.storage.fs.internalPvc.gpkgsSubPath }}
             {{- end }}

@@ -32,7 +32,7 @@ rasterCommon:
         enabled: true
         name: internal-pvc
         tilesSubPath: tiles
-        gpkgsSubPath: gpkgs
+        gpkgSubPath: gpkgs
 
 intermediateStorage:
   enabled: true
