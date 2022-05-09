@@ -28,14 +28,11 @@ rasterCommon:
   storage:
     gpkgProvider: FS
     fs:
-      gpkgsPvc:
-        enabled: true
-        name: gpkgs-storage
-        subPath: gpkgs
       internalPvc:
         enabled: true
         name: internal-pvc
-        subPath: tiles
+        tilesSubPath: tiles
+        gpkgsSubPath: gpkgs
 
 intermediateStorage:
   enabled: true
