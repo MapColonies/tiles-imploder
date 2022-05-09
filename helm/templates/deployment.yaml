@@ -89,7 +89,7 @@ spec:
               subPath: {{ .Values.rasterCommon.storage.fs.internalPvc.tilesSubPath }}
             - name: internal-storage
               mountPath: {{ .Values.env.gpkg.finalPath }}
-              subPath: {{ .Values.rasterCommon.storage.fs.internalPvc.gpkgsSubPath }}
+              subPath: {{ .Values.rasterCommon.storage.fs.internalPvc.gpkgSubPath }}
             {{- end }}
           {{- end }}
           {{- if .Values.resources.enabled }}
