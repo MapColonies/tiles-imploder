@@ -64,7 +64,7 @@ env:
   maxAttempts: 3
   gpkg:
     intermediatePath: "/intermediateStorage"
-    finalPath: "/gpksStorage"
+    finalPath: "/gpkgsStorage"
     resampling: "average"
     tilingScheme: "InspireCRS84Quad"
   batchSize: 15
