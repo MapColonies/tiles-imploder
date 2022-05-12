@@ -3,7 +3,7 @@
 {{- $cloudProviderFlavor := include "tiles-imploder.cloudProviderFlavor" . -}}
 {{- $cloudProviderDockerRegistryUrl := include "tiles-imploder.cloudProviderDockerRegistryUrl" . -}}
 {{- $cloudProviderImagePullSecretName := include "tiles-imploder.cloudProviderImagePullSecretName" . -}}
-{{- $volumesNeeded := or (.Values.rasterCommon.storage.fs.internalPvc.enabled) (.Values.rasterCommon.storage.fs.gpkgsPvc.enabled) (.Values.intermediateStorage.enabled) }}
+{{- $volumesNeeded := or (.Values.rasterCommon.storage.fs.internalPvc.enabled) (.Values.intermediateStorage.enabled) }}
 
 {{- if .Values.enabled -}}
 apiVersion: apps/v1
@@ -52,11 +52,6 @@ spec:
         persistentVolumeClaim:
           claimName: {{ .Values.rasterCommon.storage.fs.internalPvc.name }}
       {{- end }}
-      {{- if .Values.rasterCommon.storage.fs.gpkgsPvc.enabled }}
-      - name: gpkgs-storage
-        persistentVolumeClaim:
-          claimName: {{ .Values.rasterCommon.storage.fs.gpkgsPvc.name }}
-      {{- end }}
     {{- end }}
       containers:
         - name: {{ $releaseName }}-{{ $chartName }}-deployment
@@ -91,12 +86,10 @@ spec:
             {{- if .Values.rasterCommon.storage.fs.internalPvc.enabled }}
             - name: internal-storage
               mountPath: {{ .Values.env.tilesDirectoryPath }}
-              subPath: {{ .Values.rasterCommon.storage.fs.internalPvc.subPath }}
-            {{- end }}
-            {{- if .Values.rasterCommon.storage.fs.gpkgsPvc.enabled }}
-            - name: gpkgs-storage
+              subPath: {{ .Values.rasterCommon.storage.fs.internalPvc.tilesSubPath }}
+            - name: internal-storage
               mountPath: {{ .Values.env.gpkg.finalPath }}
-              subPath: {{ .Values.rasterCommon.storage.fs.gpkgsPvc.subPath }}
+              subPath: {{ .Values.rasterCommon.storage.fs.internalPvc.gpkgSubPath }}
             {{- end }}
           {{- end }}
           {{- if .Values.resources.enabled }}
